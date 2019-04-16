@@ -25,7 +25,7 @@ def back_to_home():
 
 @app.route('/register_user')
 def register_user():
-    return render_template('home.html')
+    return render_template('register.html')
 
 @app.route('/register_visitor')
 def register_visitor():
@@ -39,7 +39,24 @@ def register_employee():
 def register_employee_visitor():
     return render_template('home.html')
 
+#login methods
+@app.route('/login', methods=['GET','POST'])
+def login():
+    #currently checking username and password, need to write queries to check
+    #email and password
+    if (request.method == 'POST'):
+        sql = ("SELECT Username FROM User WHERE Username = '{email}' AND Password = '{password}';"
+            .format(email=request.form['email'], password=request.form['password']))
+        result = cursor.execute(sql);
+        if result: #if any rows returned aka username was found
+            row = cursor.fetchone()
+            session['email'] = row.get('email')
+            return "USER IS LOGGED IN"
+        else:
+            return "Incorrect Credentials. Go back and try again"
+
 if __name__ == "__main__":
+    app.secret_key = 'supersecretkey'
     app.run(debug=True)
 
 
