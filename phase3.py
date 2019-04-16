@@ -39,6 +39,23 @@ def register_employee():
 def register_employee_visitor():
     return render_template('home.html')
 
+@app.route('/register', methods=['GET','POST'])
+def register():
+    if (request.method == 'POST'):
+        if request.form['password'] != request.form['confirm_password']:
+            flash("Passwords need to match", 'alert-error')
+        else:
+            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status, UserType) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}', '{user_type}');".format(username = request.form['username'],
+                last_name = request.form['last_name'], first_name = request.form['first_name'],
+                password = request.form['password'], status = "Not Approved", user_type = "user")
+            try:
+                cursor.execute(sql)
+                connection.commit()
+                session['email'] = request.form['email']
+                return "SUCCESS"
+            except pymysql.err.IntegrityError:
+                flash("Username already exists!", 'alert-error')
+    return render_template('register.html')
 #login methods
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -50,10 +67,11 @@ def login():
         result = cursor.execute(sql);
         if result: #if any rows returned aka username was found
             row = cursor.fetchone()
-            session['email'] = row.get('email')
+            session['email'] = row.get('email') #keep track of current user
             return render_template('user_functionality.html')
         else:
-            return "Incorrect Credentials. Go back and try again"
+            flash("Incorrect Credentials. Please Try Again.", 'alert-error')
+    return render_template('home.html')
 
 if __name__ == "__main__":
     app.secret_key = 'supersecretkey'
