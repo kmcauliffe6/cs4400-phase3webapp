@@ -29,7 +29,7 @@ def register_user():
 
 @app.route('/register_visitor')
 def register_visitor():
-    return render_template('home.html')
+    return render_template('register_visitor.html')
 
 @app.route('/register_employee')
 def register_employee():
@@ -51,7 +51,7 @@ def login():
         if result: #if any rows returned aka username was found
             row = cursor.fetchone()
             session['email'] = row.get('email')
-            return "USER IS LOGGED IN"
+            return render_template('user_functionality.html')
         else:
             return "Incorrect Credentials. Go back and try again"
 
