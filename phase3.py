@@ -72,6 +72,13 @@ def login():
         else:
             flash("Incorrect Credentials. Please Try Again.", 'alert-error')
     return render_template('home.html')
+#user function methods
+@app.route('/take_transit')
+def take_transit():
+    return render_template('user_take_transit.html')
+@app.route('/view_transit_history')
+def view_transit_history():
+    return render_template('user_view_transit_history.html')
 
 if __name__ == "__main__":
     app.secret_key = 'supersecretkey'

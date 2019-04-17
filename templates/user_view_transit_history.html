@@ -1,0 +1,24 @@
+% extends "layout.html" %}
+{% block title %} Take Transit {% endblock %}
+{% block header %} <h4>Take Transit</h4> {% endblock %}
+{% block content %}
+    <form action="/" method="post">
+      <label>Transport Type</label>
+      <select name="Transport Type">
+        <option value="ALL">ALL</option>
+        <option value="MARTA">MARTA</option>
+        <option value="Bus">Bus</option>
+        <option value="Bike">Bike</option>
+      </select>
+
+      <label>Contain Site</label>
+      <select name="Contain Site">
+      </select>
+      <p></p>
+      <label>Route:</label><input type="number" name="route">
+      <label>Start Date:</label><input type="date" name="start_date">
+      <label>End Date:</label><input type="date" name="end_date">
+    </form>
+
+
+{% endblock %}

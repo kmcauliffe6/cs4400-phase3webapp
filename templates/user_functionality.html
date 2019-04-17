@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
-{% block title %} Register Navigation {% endblock %}
-{% block header %} <h4>Register Navigation</h4> {% endblock %}
+{% block title %} User Functionality {% endblock %}
+{% block header %} <h4>User Functionality</h4> {% endblock %}
 {% block content %}
 <div>
-    <a href="{{ url_for('back_to_home') }}">Take Transit</a>
+    <a href="{{ url_for('take_transit') }}">Take Transit</a>
 </div>
 <div>
-    <a href="{{ url_for('back_to_home') }}">View Transit History</a>
+    <a href="{{ url_for('view_transit_history') }}">View Transit History</a>
 </div>
 <div>
     <a href="{{ url_for('back_to_home') }}">Back</a>
