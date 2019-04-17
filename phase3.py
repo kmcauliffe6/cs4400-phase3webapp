@@ -33,12 +33,13 @@ def register_visitor():
 
 @app.route('/register_employee')
 def register_employee():
-    return render_template('home.html')
+    return render_template('register_employee.html')
 
 @app.route('/register_employee_visitor')
 def register_employee_visitor():
-    return render_template('home.html')
+    return render_template('register_employee_visitor.html')
 
+#NOTE: should probably add hashing for passwords
 @app.route('/register', methods=['GET','POST'])
 def register():
     if (request.method == 'POST'):
@@ -54,8 +55,9 @@ def register():
                 session['email'] = request.form['email']
                 return "SUCCESS"
             except pymysql.err.IntegrityError:
-                flash("Username already exists!", 'alert-error')
+                flash("That email already exists. Please try again.", 'alert-error')
     return render_template('register.html')
+
 #login methods
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -72,6 +74,7 @@ def login():
         else:
             flash("Incorrect Credentials. Please Try Again.", 'alert-error')
     return render_template('home.html')
+
 #user function methods
 @app.route('/take_transit')
 def take_transit():

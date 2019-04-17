@@ -10,12 +10,13 @@
         <p><label>Password:</label><input type="password" name="password">
         <p><label>Confirm Password:</label><input type="password" name="confirm_password">
         <p><label>Email:</label><input type="text" name="email">
-        <input class="btn btn-default" type="submit" value="Add Another Email">
+        <input class="btn btn-default" type="submit" name="email_button" value="Add Another Email">
         <p><input class="btn btn-default" type="submit" value="Register">
     </form>
 </div>
 
 <div>
-    <a href="{{ url_for('back_to_home') }}">Back</a>
+    <a href="{{ url_for(registernavigation') }}">Back</a>
 </div>
+
 {% endblock %}
