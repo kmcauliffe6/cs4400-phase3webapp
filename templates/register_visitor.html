@@ -3,12 +3,14 @@
 {% block header %} <h4>Visitor Registration</h4> {% endblock %}
 {% block content %}
 <div>
-    <form action="/" method="post">
+    <form action="/register_visitor_buttonclick" method="post">
         <label>First Name:</label><input type="text" name="first_name">
         <p><label>Last Name:</label><input type="text" name="last_name">
         <p><label>Username:</label><input type="text" name="username">
         <p><label>Password:</label><input type="password" name="password">
-        <p><label>Confirm Password:</label><input type="password" name="confirmPassword">
+        <p><label>Confirm Password:</label><input type="password" name="confirm_password">
+        <p><label>Email:</label><input type="text" name="email">
+        <input class="btn btn-default" type="submit" name="email_button" value="Add Another Email"></p>
         <p><input class="btn btn-default" type="submit" value="Register">
     </form>
 </div>
