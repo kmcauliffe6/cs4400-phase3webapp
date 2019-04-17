@@ -46,14 +46,16 @@ def register():
         if request.form['password'] != request.form['confirm_password']:
             flash("Passwords need to match", 'alert-error')
         else:
-            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status, UserType) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}', '{user_type}');".format(username = request.form['username'],
+            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
                 last_name = request.form['last_name'], first_name = request.form['first_name'],
-                password = request.form['password'], status = "Not Approved", user_type = "user")
+                password = request.form['password'], status = "Not Approved")
+            sql2 = "INSERT INTO UserEmail(Email, Username) VALUES ('{email}', '{username}')".format(email = request.form['email'], username = request.form['username'])
             try:
                 cursor.execute(sql)
+                cursor.execute(sql2)
                 connection.commit()
                 session['email'] = request.form['email']
-                return "SUCCESS"
+                return render_template('user_functionality')
             except pymysql.err.IntegrityError:
                 flash("That email already exists. Please try again.", 'alert-error')
     return render_template('register.html')
@@ -64,9 +66,13 @@ def login():
     #currently checking username and password, need to write queries to check
     #email and password
     if (request.method == 'POST'):
-        sql = ("SELECT Username FROM User WHERE Username = '{email}' AND Password = '{password}';"
-            .format(email=request.form['email'], password=request.form['password']))
-        result = cursor.execute(sql);
+        sql1 = "SELECT Username FROM UserEmail WHERE Email = '{email}'".format(email = request.form['email'])
+        result = cursor.execute(sql1);
+        username = ""
+        for row in cursor:
+            username = row['Username']
+        sql2 = "SELECT * FROM  User WHERE Username = '{username1}' AND Password = '{password}'".format(username1 = username, password = request.form['password'])
+        result = cursor.execute(sql2);
         if result: #if any rows returned aka username was found
             row = cursor.fetchone()
             session['email'] = row.get('email') #keep track of current user
