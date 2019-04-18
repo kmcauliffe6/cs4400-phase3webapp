@@ -3,7 +3,7 @@
 {% block header %} <h4>Register Employee Visitor</h4> {% endblock %}
 {% block content %}
 <div>
-    <form action="/" method="post">
+    <form action="/register_employee_visitor_buttonclick" method="post">
         <label>First Name:</label><input type="text" name="first_name">
         <label>Last Name:</label><input type="text" name="last_name">
         <p><label>Username:</label><input type="text" name="username">
@@ -13,19 +13,18 @@
             <option value="Staff">Staff</option>
         </select>
         <p><label>Password:</label><input type="password" name="password">
-        <label>Confirm Password:</label><input type="password" name="confirmPassword"></p>
+        <label>Confirm Password:</label><input type="password" name="confirm_password"></p>
         <p><label>Phone:</label><input type="number" name="phone">
         <label>Address:</label><input type="text" name="address"></p>
-        <p><label>City:</label><input type="text" name="address">
+        <p><label>City:</label><input type="text" name="city">
         <h5>State</h5>
-        <select name="State">
+        <select name="state">
             <!-- add all other abbreviations later -->
             <option value="GA">GA</option>
             <option value="Other">Other</option>
         </select>
         <p><label>Zipcode:</label><input type="number" name="zipcode"></p>
-        <p><label>Email:</label><input type="text" name="email">
-        <input class="btn btn-default" type="submit" name="email_button" value="Add Another Email"></p>
+        <p><label>Email (enter as many as desired, separated by commas):</label><input type="text" name="email">
         <p><input class="btn btn-default" type="submit" value="Register">
     </form>
 </div>

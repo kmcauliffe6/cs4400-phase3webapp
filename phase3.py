@@ -52,6 +52,9 @@ def register():
                 password = request.form['password'], status = "Not Approved")
             try:
                 cursor.execute(sql)
+            except pymysql.err.IntegrityError:
+                flash("That username already exists. Please try again.", 'alert-error')
+            try:
                 for eemail in emails:
                     sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
                     cursor.execute(sql2)
@@ -61,7 +64,9 @@ def register():
                 correctpage = goToCorrectFunctionalityPage()
                 return render_template('{page}'.format(page = correctpage))
             except pymysql.err.IntegrityError:
-                flash("That email already exists. Please try again.", 'alert-error')
+                flash("One of your emails is already being used. Please try again", 'alert-error')
+    return render_template('register.html')
+
 
 @app.route('/register_visitor_buttonclick', methods=['GET','POST'])
 def register_visitor_buttonclick():
@@ -72,11 +77,18 @@ def register_visitor_buttonclick():
             sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
                 last_name = request.form['last_name'], first_name = request.form['first_name'],
                 password = request.form['password'], status = "Not Approved")
-            sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = request.form['email'], username = request.form['username'])
-            sql3 = "INSERT INTO Visitor(VisUsername) VALUES ('{username}')".format(username = request.form['username'])
             try:
                 cursor.execute(sql)
-                cursor.execute(sql2)
+            except pymysql.err.IntegrityError:
+                flash("That username already exists. Please try again.", 'alert-error')
+            try:
+                for eemail in emails:
+                    sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
+                    cursor.execute(sql2)
+            except pymysql.err.IntegrityError:
+                flash("One of your emails is already being used. Please try again", 'alert-error')
+            sql3 = "INSERT INTO Visitor(VisUsername) VALUES ('{username}')".format(username = request.form['username'])
+            try:
                 cursor.execute(sql3)
                 connection.commit()
                 session['email'] = request.form['email']
@@ -84,9 +96,11 @@ def register_visitor_buttonclick():
                 correctpage = goToCorrectFunctionalityPage()
                 return render_template('{page}'.format(page = correctpage))
             except pymysql.err.IntegrityError:
-                flash("That email already exists. Please try again.", 'alert-error')
+                flash("Something went wrong.", 'alert-error')
         return render_template('register_visitor.html')
-@app.route('/register_visitor_buttonclick', methods=['GET','POST'])
+
+#these two are giving integrity errors for everything??
+@app.route('/register_employee_buttonclick', methods=['GET','POST'])
 def register_employee_buttonclick():
     if (request.method == 'POST'):
         if request.form['password'] != request.form['confirm_password']:
@@ -95,16 +109,23 @@ def register_employee_buttonclick():
             sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
                 last_name = request.form['last_name'], first_name = request.form['first_name'],
                 password = request.form['password'], status = "Not Approved")
-            sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = request.form['email'], username = request.form['username'])
-            if request.form['User Type'] == "Manager":
-                sql3 = "INSERT INTO Manager(MngUsername) VALUES ('{username}')".format(username = request.form['username'])
-            else:
-                sql3 = "INSERT INTO Visitor(VisUsername) VALUES ('{username}')".format(username = request.form['username'])
-            #need to get employee ID??
-            sql4 = "INSERT INTO Employee(EUsername, Phone, EmployeeID, Address, City, State, Zipcode) VALUES ('{username}', '{phone}', '{id}', '{address}', '{city}', '{state}', '{zipcode'));".format(username = request.form['username'], phone = request.form['phone'], id = "111", address = request.form['address'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'])
             try:
                 cursor.execute(sql)
-                cursor.execute(sql2)
+            except pymysql.err.IntegrityError:
+                flash("That username already exists. Please try again.", 'alert-error')
+            try:
+                for eemail in emails:
+                        sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
+                        cursor.execute(sql2)
+            except pymysql.err.IntegrityError:
+                flash("That email already exists. Please try again.", 'alert-error')
+            sql3 = "INSERT INTO Employee(EUsername, Phone, EmployeeID, Address, City, State, Zipcode) VALUES ('{username}', '{phone}', '{id}', '{address}', '{city}', '{state}', '{zipcode}');".format(username = request.form['username'], phone = request.form['phone'], id = 111, address = request.form['address'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'])
+            if request.form['User Type'] == "Manager":
+                sql4 = "INSERT INTO Manager(MngUsername) VALUES ('{username}')".format(username = request.form['username'])
+            else:
+                sql4 = "INSERT INTO Staff(StaffUsername) VALUES ('{username}')".format(username = request.form['username'])
+            #need to get employee ID??
+            try:
                 cursor.execute(sql3)
                 cursor.execute(sql4)
                 connection.commit()
@@ -113,8 +134,46 @@ def register_employee_buttonclick():
                 correctpage = goToCorrectFunctionalityPage()
                 return render_template('{page}'.format(page = correctpage))
             except pymysql.err.IntegrityError:
-                flash("That email already exists. Please try again.", 'alert-error')
+                flash("Something went wrong", 'alert-error')
     return render_template('register.html')
+@app.route('/register_employee_visitor_buttonclick', methods=['GET','POST'])
+def register_employee_visitor_buttonclick():
+    if (request.method == 'POST'):
+        if request.form['password'] != request.form['confirm_password']:
+            flash("Passwords need to match", 'alert-error')
+        else:
+            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
+                last_name = request.form['last_name'], first_name = request.form['first_name'],
+                password = request.form['password'], status = "Not Approved")
+            try:
+                cursor.execute(sql)
+            except pymysql.err.IntegrityError:
+                flash("That username already exists. Please try again.", 'alert-error')
+            try:
+                for eemail in emails:
+                        sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
+                        cursor.execute(sql2)
+            except pymysql.err.IntegrityError:
+                flash("That email already exists. Please try again.", 'alert-error')
+            sql3 = "INSERT INTO Employee(EUsername, Phone, EmployeeID, Address, City, State, Zipcode) VALUES ('{username}', '{phone}', '{id}', '{address}', '{city}', '{state}', '{zipcode}');".format(username = request.form['username'], phone = request.form['phone'], id = 111, address = request.form['address'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'])
+            if request.form['User Type'] == "Manager":
+                sql4 = "INSERT INTO Manager(MngUsername) VALUES ('{username}')".format(username = request.form['username'])
+            else:
+                sql4 = "INSERT INTO Staff(StaffUsername) VALUES ('{username}')".format(username = request.form['username'])
+            sql5 = "INSERT INTO Visitor(VisUsername) VALUES ('{username}')".format(username = request.form['username'])
+            #need to get employee ID
+            try:
+                cursor.execute(sql3)
+                cursor.execute(sql4)
+                cursor.execute(sql5)
+                connection.commit()
+                session['email'] = request.form['email']
+                getUserType(request.form['username'])
+                correctpage = goToCorrectFunctionalityPage()
+                return render_template('{page}'.format(page = correctpage))
+            except pymysql.err.IntegrityError:
+                flash("Something went wrong. Please try again.", 'alert-error')
+    return render_template('register_employee_visitor.html')
 
 #login methods
 @app.route('/login', methods=['GET','POST'])
@@ -179,6 +238,8 @@ def goToCorrectFunctionalityPage():
        return 'user_functionality.html'
     if session['user_type'] == "visitor":
         return 'visitor_functionality.html'
+    if session['user_type'] == "employee":
+        return 'employee_functionality.html'
 
 if __name__ == "__main__":
     app.secret_key = 'supersecretkey'
