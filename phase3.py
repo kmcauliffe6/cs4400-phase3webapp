@@ -39,6 +39,28 @@ def register_employee():
 def register_employee_visitor():
     return render_template('register_employee_visitor.html')
 
+@app.route('/employee_manage_profile', methods=['GET','POST'])
+def employee_manage_profile():
+    sql = "SELECT * FROM User WHERE Username = '{username}'".format(username = session['username'])
+    cursor.execute(sql);
+    userdetails = cursor.fetchone()
+    print(userdetails)
+    first_name = userdetails['Firstname']
+    last_name = userdetails['Lastname']
+    username = userdetails['Username']
+    #site name
+    sql1 =
+    #employee ID
+    #phone
+    #address
+    #emails
+    data = [first_name, last_name, username]
+    return render_template('manage_profile.html', data=data)
+
+@app.route('/admin_manage_user', methods=['GET','POST'])
+def admin_manage_user():
+    render_template('admin_manage_user.html')
+
 #NOTE: should probably add hashing for passwords
 @app.route('/register', methods=['GET','POST'])
 def register():
@@ -211,15 +233,22 @@ def take_transit():
     sql = "SELECT Sname FROM Site"
     cursor.execute(sql)
     sites = cursor.fetchall()
-    print(sites)
     return render_template('user_take_transit.html', sites = sites)
 @app.route('/view_transit_history')
 def view_transit_history():
-    return render_template('user_view_transit_history.html')
-
+    sql = "SELECT Sname FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    return render_template('user_view_transit_history.html', sites = sites)
+#navigation methods
 @app.route('/go_to_user_functionality')
 def go_to_user_functionality():
     return render_template("user_functionality.html")
+
+@app.route('/go_to_user_type_functionality')
+def go_to_user_type_functionality():
+    correctpage = goToCorrectFunctionalityPage()
+    return render_template('{page}'.format(page = correctpage))
 
 #transit methods
 @app.route('/filter_transit_buttonClick',methods=['GET','POST'])

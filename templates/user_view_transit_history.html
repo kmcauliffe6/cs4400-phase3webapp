@@ -4,15 +4,17 @@
 {% block content %}
     <form action="/" method="post">
       <label>Transport Type</label>
-      <select name="Transport Type">
+      <select name="transport_type">
         <option value="ALL">ALL</option>
         <option value="MARTA">MARTA</option>
         <option value="Bus">Bus</option>
         <option value="Bike">Bike</option>
       </select>
-
       <label>Contain Site</label>
-      <select name="Contain Site">
+      <select name="sites">
+        {% for site in sites %}
+              <option value= "{{site.SName}}" SELECTED>{{site.Sname}}</option>"
+          {% endfor %}
       </select>
       <p></p>
       <label>Route:</label><input type="number" name="route">

@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block title %} Manage User {% endblock %}
+{% block header %} <h4>Manage User</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/update_profile" method="post">
+        <label>Username:</label><input type="text" name="first_name">
+        <p><h5>Type</h5>
+        <select name="user_type">
+            <option value="All">ALL</option>
+            <option value="Manager">Manager</option>
+            <option value="User">User</option>
+            <option value="Visitor">Visitor</option>
+            <option value="Staff">Staff</option>
+        </select>
+        <p><h5>Status</h5>
+        <select name="status">
+          <option value="ALL">ALL</option>
+          <option value="Pending">Pending</option>
+          <option value="Visitor">Visitor</option>
+          <option value="User">User</option>
+        </select>
+        <input class="btn btn-default" type="submit" value="Filter">
+    </form>
+</div>
+</form>
+<table style="width:100%">
+  <tr>
+    <th>Username</th>
+    <th>Email Count</th>
+    <th>User Type</th>
+    <th>Status</th>
+  </tr>
+</table>
+<input class="btn btn-default" type="submit" value="Approve">
+<input class="btn btn-default" type="submit" value="Decline">
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}

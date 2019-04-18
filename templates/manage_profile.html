@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %} Manage Profile {% endblock %}
+{% block header %} <h4>Manage Profile</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/update_profile" method="post">
+        <p><label>Current First Name:</label><label>{{data[0]}}</label></p>
+        <label>Update First Name:</label><input type="text" name="first_name">
+         <p><label>Current Last Name:</label><label>{{data[1]}}</label></p>
+        <label>Update Last Name:</label><input type="text" name="last_name">
+        <p><label>Username:</label><label>{{data[2]}}</label></p>
+        <p><label>Site Name:</label><label>{{data[3]}}</label></p>
+
+        <input class="btn btn-default" type="submit" value="Update">
+    </form>
+</div>
+
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}
