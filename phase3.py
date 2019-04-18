@@ -266,6 +266,10 @@ def goToCorrectFunctionalityPage():
         return "staff_visitor_functionality.html"
     if session['user_type'] == "staff":
         return "staff_functionality.html"
+    if session['user_type'] == "admin":
+        return "administrator_functionality.html"
+    if session['user_type'] == "admin-visitor":
+        return "admin_visitor_functionality.html"
 
 if __name__ == "__main__":
     app.secret_key = 'supersecretkey'
