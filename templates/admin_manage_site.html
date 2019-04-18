@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block title %} Admin Manage Site {% endblock %}
+{% block header %} <h4>Admin Manage Site</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/admin_manage_site_filterClick" method="post">
+        <p><h5>Site</h5>
+          <option value="ALL">ALL</option>
+        <select name="site">
+        </select>
+        <p><h5>Manager</h5>
+        <select name="manager">
+          <option value="ALL">ALL</option>
+        </select>
+        <p><h5>Open Everyday</h5>
+        <select name="open_everyday">
+          <option value="Yes">ALL</option>
+          <option value="No">ALL</option>
+        </select>
+        <input class="btn btn-default" type="submit" value="Filter">
+    </form>
+</div>
+</form>
+<table style="width:100%">
+  <tr>
+    <th>Name</th>
+    <th>Manager</th>
+    <th>Open Everyday</th>
+  </tr>
+</table>
+<input class="btn btn-default" type="submit" value="Create">
+<input class="btn btn-default" type="submit" value="Edit">
+<input class="btn btn-default" type="submit" value="Delete">
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}
