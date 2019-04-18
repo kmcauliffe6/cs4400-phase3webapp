@@ -54,6 +54,7 @@ def register():
                 cursor.execute(sql)
             except pymysql.err.IntegrityError:
                 flash("That username already exists. Please try again.", 'alert-error')
+                return render_template('register.html')
             try:
                 for eemail in emails:
                     sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
@@ -138,6 +139,7 @@ def register_employee_buttonclick():
             except pymysql.err.IntegrityError:
                 flash("Something went wrong", 'alert-error')
     return render_template('register.html')
+
 @app.route('/register_employee_visitor_buttonclick', methods=['GET','POST'])
 def register_employee_visitor_buttonclick():
     if (request.method == 'POST'):
@@ -218,18 +220,20 @@ def go_to_user_functionality():
 def getUserType(username):
     print(username)
     #need to add visitor/user case
-    sql = "SELECT * FROM Manager WHERE MngUsername = '{username1}'".format(username1 = username)
+    sql1 = "SELECT * FROM Manager WHERE MngUsername = '{username1}'".format(username1 = username)
     sql2 = "SELECT * FROM Visitor WHERE VisUsername = '{username1}'".format(username1 = username)
     sql3 = "SELECT * FROM Staff WHERE StaffUsername = '{username1}'".format(username1 = username)
     sql4 = "SELECT * FROM Administrator WHERE AdminUsername = '{username1}'".format(username1 = username)
-    isManager = cursor.execute(sql)
+    sql5 = "SELECT * FROM User WHERE Username = '{username1}'".format(username1 = username)
+    isUser = cursor.execute(sql5)
+    isManager = cursor.execute(sql1)
     isVisitor = cursor.execute(sql2)
     isStaff = cursor.execute(sql3)
     isAdmin = cursor.execute(sql4)
     if isManager and isVisitor:
         session['user_type'] = "manager-visitor"
         return;
-    elif isManager:
+    if isManager:
         session['user_type'] = "manager"
         return;
     if isStaff and isVisitor:
@@ -241,14 +245,12 @@ def getUserType(username):
     if isAdmin and isVisitor:
         session['user_type'] = "admin-visitor"
         return;
-    elif ifAdmin:
+    elif isAdmin:
         session['user_type'] = "admin"
         return;
     if isVisitor:
         session['user_type'] = "visitor"
         return;
-    sql5 = "SELECT * FROM User WHERE Username = '{username1}'".format(username1 = username)
-    isUser = cursor.execute(sql)
     if isUser:
         session['user_type'] = "user"
         return;

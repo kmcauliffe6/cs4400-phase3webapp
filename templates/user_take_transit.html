@@ -2,7 +2,7 @@
 {% block title %} Take Transit {% endblock %}
 {% block header %} <h4>Take Transit</h4> {% endblock %}
 {% block content %}
-    <form action="/" method="post">
+    <form action="/filter_transit_buttonClick" method="post">
         <h5>Contain Site</h5>
         <select name="Contain Site">
         </select>
@@ -15,8 +15,13 @@
         </select>
         <p><label>Price Range:</label><input type="number" name="lower range">
         <label>--</label><input type="number" name="upper range"></p>
-
+         <p><input class="btn btn-default" type="submit" value="Filter">
     </form>
+    <form action="/log_transit_buttonClick" method="post">
+        <label>Transit Date</label><input type="date" name="transit_date"></p>
+        <p><input class="btn btn-default" type="submit" value="Log Transit">
+    </form>
+
 <div>
     <a href="{{ url_for('go_to_user_functionality') }}">Back</a>
 </div>
