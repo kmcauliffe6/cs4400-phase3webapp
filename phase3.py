@@ -46,21 +46,22 @@ def register():
         if request.form['password'] != request.form['confirm_password']:
             flash("Passwords need to match", 'alert-error')
         else:
+            emails = request.form['email'].split(',')
             sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
                 last_name = request.form['last_name'], first_name = request.form['first_name'],
                 password = request.form['password'], status = "Not Approved")
-            sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = request.form['email'], username = request.form['username'])
             try:
                 cursor.execute(sql)
-                cursor.execute(sql2)
+                for eemail in emails:
+                    sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
+                    cursor.execute(sql2)
                 connection.commit()
-                session['email'] = request.form['email']
+                session['username'] = request.form['username']
                 getUserType(request.form['username'])
-                goToCorrectFunctionalityPage()
-                return render_template('user_functionality')
+                correctpage = goToCorrectFunctionalityPage()
+                return render_template('{page}'.format(page = correctpage))
             except pymysql.err.IntegrityError:
                 flash("That email already exists. Please try again.", 'alert-error')
-    return render_template('register.html')
 
 @app.route('/register_visitor_buttonclick', methods=['GET','POST'])
 def register_visitor_buttonclick():
@@ -80,8 +81,37 @@ def register_visitor_buttonclick():
                 connection.commit()
                 session['email'] = request.form['email']
                 getUserType(request.form['username'])
-                goToCorrectFunctionalityPage()
-                return render_template('user_functionality')
+                correctpage = goToCorrectFunctionalityPage()
+                return render_template('{page}'.format(page = correctpage))
+            except pymysql.err.IntegrityError:
+                flash("That email already exists. Please try again.", 'alert-error')
+        return render_template('register_visitor.html')
+@app.route('/register_visitor_buttonclick', methods=['GET','POST'])
+def register_employee_buttonclick():
+    if (request.method == 'POST'):
+        if request.form['password'] != request.form['confirm_password']:
+            flash("Passwords need to match", 'alert-error')
+        else:
+            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
+                last_name = request.form['last_name'], first_name = request.form['first_name'],
+                password = request.form['password'], status = "Not Approved")
+            sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = request.form['email'], username = request.form['username'])
+            if request.form['User Type'] == "Manager":
+                sql3 = "INSERT INTO Manager(MngUsername) VALUES ('{username}')".format(username = request.form['username'])
+            else:
+                sql3 = "INSERT INTO Visitor(VisUsername) VALUES ('{username}')".format(username = request.form['username'])
+            #need to get employee ID??
+            sql4 = "INSERT INTO Employee(EUsername, Phone, EmployeeID, Address, City, State, Zipcode) VALUES ('{username}', '{phone}', '{id}', '{address}', '{city}', '{state}', '{zipcode'));".format(username = request.form['username'], phone = request.form['phone'], id = "111", address = request.form['address'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'])
+            try:
+                cursor.execute(sql)
+                cursor.execute(sql2)
+                cursor.execute(sql3)
+                cursor.execute(sql4)
+                connection.commit()
+                session['email'] = request.form['email']
+                getUserType(request.form['username'])
+                correctpage = goToCorrectFunctionalityPage()
+                return render_template('{page}'.format(page = correctpage))
             except pymysql.err.IntegrityError:
                 flash("That email already exists. Please try again.", 'alert-error')
     return render_template('register.html')
@@ -103,7 +133,8 @@ def login():
             row = cursor.fetchone()
             session['email'] = row.get('email') #keep track of current user
             getUserType(username)
-            return render_template('user_functionality.html')
+            correctpage = goToCorrectFunctionalityPage()
+            return render_template('{page}'.format(page = correctpage))
         else:
             flash("Incorrect Credentials. Please Try Again.", 'alert-error')
     return render_template('home.html')
@@ -115,8 +146,13 @@ def take_transit():
 @app.route('/view_transit_history')
 def view_transit_history():
     return render_template('user_view_transit_history.html')
+
+@app.route('/go_to_user_functionality')
+def go_to_user_functionality():
+    return render_template("user_functionality.html")
 #helper methods
 def getUserType(username):
+    print(username)
     #need to add visitor/user case
     sql = "SELECT * FROM Manager WHERE MngUsername = '{username1}'".format(username1 = username)
     result = cursor.execute(sql)
@@ -140,21 +176,13 @@ def getUserType(username):
 
 def goToCorrectFunctionalityPage():
     if session['user_type'] == 'user':
-        render_template('user_functionality.html')
+       return 'user_functionality.html'
     if session['user_type'] == "visitor":
-        render_template('visitor_functionality.html')
+        return 'visitor_functionality.html'
 
 if __name__ == "__main__":
     app.secret_key = 'supersecretkey'
     app.run(debug=True)
-
-
-""""sql = "SELECT username FROM User WHERE username = 'lara'"
-    result = cursor.execute(sql)
-    answer = ""
-    for row in cursor:
-        answer += row['username']
-"""
 
 
 
