@@ -82,6 +82,7 @@ def register_visitor_buttonclick():
             except pymysql.err.IntegrityError:
                 flash("That username already exists. Please try again.", 'alert-error')
             try:
+                emails = request.form['email'].split(',')
                 for eemail in emails:
                     sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
                     cursor.execute(sql2)
@@ -114,6 +115,7 @@ def register_employee_buttonclick():
             except pymysql.err.IntegrityError:
                 flash("That username already exists. Please try again.", 'alert-error')
             try:
+                emails = request.form['email'].split(',')
                 for eemail in emails:
                         sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
                         cursor.execute(sql2)
@@ -150,6 +152,7 @@ def register_employee_visitor_buttonclick():
             except pymysql.err.IntegrityError:
                 flash("That username already exists. Please try again.", 'alert-error')
             try:
+                emails = request.form['email'].split(',')
                 for eemail in emails:
                         sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
                         cursor.execute(sql2)
@@ -193,6 +196,8 @@ def login():
             session['email'] = row.get('email') #keep track of current user
             getUserType(username)
             correctpage = goToCorrectFunctionalityPage()
+            print(username)
+            print(session['user_type'])
             return render_template('{page}'.format(page = correctpage))
         else:
             flash("Incorrect Credentials. Please Try Again.", 'alert-error')
@@ -214,32 +219,42 @@ def getUserType(username):
     print(username)
     #need to add visitor/user case
     sql = "SELECT * FROM Manager WHERE MngUsername = '{username1}'".format(username1 = username)
+    sql2 = "SELECT * FROM Visitor WHERE VisUsername = '{username1}'".format(username1 = username)
+    result = cursor.execute(sql)
+    result2 = cursor.execute(sql2)
+    if result and result2:
+        session['user_type'] = "manager-visitor"
+        return;
+    sql = "SELECT * FROM Manager WHERE MngUsername = '{username1}'".format(username1 = username)
     result = cursor.execute(sql)
     if result:
         session['user_type'] = "manager"
-    else:
-        sql = "SELECT * FROM Staff WHERE StaffUsername = '{username1}'".format(username1 = username)
-        result = cursor.execute(sql)
-        if result:
-            session['user_type'] = "staff"
-        else:
-            sql = "SELECT * FROM Visitor WHERE VisUsername = '{username1}'".format(username1 = username)
-            result = cursor.execute(sql)
-            if result:
-                session['user_type'] = "visitor"
-            else:
-                sql = "SELECT * FROM User WHERE Username = '{username1}'".format(username1 = username)
-                result = cursor.execute(sql)
-                if result:
-                    session['user_type'] = "user"
+        return;
+    sql = "SELECT * FROM Staff WHERE StaffUsername = '{username1}'".format(username1 = username)
+    result = cursor.execute(sql)
+    if result:
+        session['user_type'] = "staff"
+        return;
+    sql = "SELECT * FROM Visitor WHERE VisUsername = '{username1}'".format(username1 = username)
+    result = cursor.execute(sql)
+    if result:
+        session['user_type'] = "visitor"
+        return;
+    sql = "SELECT * FROM User WHERE Username = '{username1}'".format(username1 = username)
+    result = cursor.execute(sql)
+    if result:
+        session['user_type'] = "user"
+        return;
 
 def goToCorrectFunctionalityPage():
     if session['user_type'] == 'user':
        return 'user_functionality.html'
     if session['user_type'] == "visitor":
         return 'visitor_functionality.html'
-    if session['user_type'] == "employee":
-        return 'employee_functionality.html'
+    if session['user_type'] == "manager":
+        return 'manager_functionality.html'
+    if session['user_type'] == "manager-visitor":
+        return "manager_visitor_functionality.html"
 
 if __name__ == "__main__":
     app.secret_key = 'supersecretkey'

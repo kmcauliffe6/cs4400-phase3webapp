@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %} Manager Functionality {% endblock %}
+{% block header %} <h4>Manager Functionality</h4> {% endblock %}
+{% block content %}
+
+<div>
+    <a href="{{ url_for('take_transit') }}">Manage Profile</a>
+</div>
+<div>
+    <a href="{{ url_for('take_transit') }}">Manage Event</a>
+</div>
+<div>
+    <a href="{{ url_for('take_transit') }}">View Site Report</a>
+</div>
+<div>
+    <a href="{{ url_for('take_transit') }}">View Staff</a>
+</div>
+<div>
+    <a href="{{ url_for('take_transit') }}">Take Transit</a>
+</div>
+<div>
+    <a href="{{ url_for('view_transit_history') }}">View Transit History</a>
+</div>
+<div>
+    <a href="{{ url_for('back_to_home') }}">Back</a>
+</div>
+
+
+{% endblock %}
