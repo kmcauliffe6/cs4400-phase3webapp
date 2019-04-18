@@ -220,29 +220,36 @@ def getUserType(username):
     #need to add visitor/user case
     sql = "SELECT * FROM Manager WHERE MngUsername = '{username1}'".format(username1 = username)
     sql2 = "SELECT * FROM Visitor WHERE VisUsername = '{username1}'".format(username1 = username)
-    result = cursor.execute(sql)
-    result2 = cursor.execute(sql2)
-    if result and result2:
+    sql3 = "SELECT * FROM Staff WHERE StaffUsername = '{username1}'".format(username1 = username)
+    sql4 = "SELECT * FROM Administrator WHERE AdminUsername = '{username1}'".format(username1 = username)
+    isManager = cursor.execute(sql)
+    isVisitor = cursor.execute(sql2)
+    isStaff = cursor.execute(sql3)
+    isAdmin = cursor.execute(sql4)
+    if isManager and isVisitor:
         session['user_type'] = "manager-visitor"
         return;
-    sql = "SELECT * FROM Manager WHERE MngUsername = '{username1}'".format(username1 = username)
-    result = cursor.execute(sql)
-    if result:
+    elif isManager:
         session['user_type'] = "manager"
         return;
-    sql = "SELECT * FROM Staff WHERE StaffUsername = '{username1}'".format(username1 = username)
-    result = cursor.execute(sql)
-    if result:
+    if isStaff and isVisitor:
+        session['user_type'] = "staff-visitor"
+        return;
+    elif isStaff:
         session['user_type'] = "staff"
         return;
-    sql = "SELECT * FROM Visitor WHERE VisUsername = '{username1}'".format(username1 = username)
-    result = cursor.execute(sql)
-    if result:
+    if isAdmin and isVisitor:
+        session['user_type'] = "admin-visitor"
+        return;
+    elif ifAdmin:
+        session['user_type'] = "admin"
+        return;
+    if isVisitor:
         session['user_type'] = "visitor"
         return;
-    sql = "SELECT * FROM User WHERE Username = '{username1}'".format(username1 = username)
-    result = cursor.execute(sql)
-    if result:
+    sql5 = "SELECT * FROM User WHERE Username = '{username1}'".format(username1 = username)
+    isUser = cursor.execute(sql)
+    if isUser:
         session['user_type'] = "user"
         return;
 
@@ -255,6 +262,10 @@ def goToCorrectFunctionalityPage():
         return 'manager_functionality.html'
     if session['user_type'] == "manager-visitor":
         return "manager_visitor_functionality.html"
+    if session['user_type'] == "staff-visitor":
+        return "staff_visitor_functionality.html"
+    if session['user_type'] == "staff":
+        return "staff_functionality.html"
 
 if __name__ == "__main__":
     app.secret_key = 'supersecretkey'
