@@ -1,6 +1,6 @@
-% extends "layout.html" %}
-{% block title %} Take Transit {% endblock %}
-{% block header %} <h4>Take Transit</h4> {% endblock %}
+{% extends "layout.html" %}
+{% block title %} View Transit History {% endblock %}
+{% block header %} <h4>View Transit History </h4> {% endblock %}
 {% block content %}
     <form action="/" method="post">
       <label>Transport Type</label>
@@ -18,7 +18,21 @@
       <label>Route:</label><input type="number" name="route">
       <label>Start Date:</label><input type="date" name="start_date">
       <label>End Date:</label><input type="date" name="end_date">
+      <p><input class="btn btn-default" type="submit" value="Filter">
     </form>
 
+    </form>
+    <table style="width:100%">
+      <tr>
+        <th>Route</th>
+        <th>Transit Type</th>
+        <th>Price</th>
+        <th># Connected Sites</th>
+      </tr>
+    </table>
+
+<div>
+    <a href="{{ url_for('go_to_user_functionality') }}">Back</a>
+</div>
 
 {% endblock %}

@@ -4,11 +4,13 @@
 {% block content %}
     <form action="/filter_transit_buttonClick" method="post">
         <h5>Contain Site</h5>
-        <select name="Contain Site">
+        <select name="Contain Site" method="GET" action="/">
+          {% for site in sites %}
+              <option value= "{{site.SName}}" SELECTED>{{site.Sname}}</option>"
+          {% endfor %}
         </select>
         <p><h5>Transport Type</h5>
         <select name="Transport Type">
-          <option value="ALL">ALL</option>
           <option value="MARTA">MARTA</option>
           <option value="Bus">Bus</option>
           <option value="Bike">Bike</option>
@@ -17,6 +19,19 @@
         <label>--</label><input type="number" name="upper range"></p>
          <p><input class="btn btn-default" type="submit" value="Filter">
     </form>
+    <table style="width:100%">
+      <tr>
+        <th>Route</th>
+        <th>Transit Type</th>
+        <th>Price</th>
+        <th># Connected Sites</th>
+      </tr>
+      {% for item in data %}
+        <tr>
+          <td>{{item.Username}}</td>
+        </tr>
+      {% endfor %}
+    </table>
     <form action="/log_transit_buttonClick" method="post">
         <label>Transit Date</label><input type="date" name="transit_date"></p>
         <p><input class="btn btn-default" type="submit" value="Log Transit">

@@ -208,7 +208,11 @@ def login():
 #user function methods
 @app.route('/take_transit')
 def take_transit():
-    return render_template('user_take_transit.html')
+    sql = "SELECT Sname FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    print(sites)
+    return render_template('user_take_transit.html', sites = sites)
 @app.route('/view_transit_history')
 def view_transit_history():
     return render_template('user_view_transit_history.html')
@@ -216,6 +220,15 @@ def view_transit_history():
 @app.route('/go_to_user_functionality')
 def go_to_user_functionality():
     return render_template("user_functionality.html")
+
+#transit methods
+@app.route('/filter_transit_buttonClick',methods=['GET','POST'])
+def filter_transit_buttonClick():
+    sql = "SELECT * FROM User"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('user_take_transit.html', data=data)
+
 #helper methods
 def getUserType(username):
     print(username)
