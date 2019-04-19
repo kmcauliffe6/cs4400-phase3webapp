@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block title %} Administrator Create Site {% endblock %}
+{% block header %} <h4>Administrator Create Site</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/admin_edit_site_updateClicked" method="post">
+        <label>Name:</label><input type="text" name="site_name">
+        <label>Zipcode:</label><input type="number" name="zipcode">
+        <label>Address:</label><input type="number" name="address">
+        p><h5>Manager</h5>
+        <select name="manager">
+        </select>
+        <input type="checkbox" name="open_everyday" value="open_everyday">Open Everyday<br>
+        <input class="btn btn-default" type="submit" value="Create">
+    </form>
+</div>
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}

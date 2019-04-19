@@ -49,7 +49,7 @@ def employee_manage_profile():
     last_name = userdetails['Lastname']
     username = userdetails['Username']
     #site name
-    sql1 =
+    #sql1 =
     #employee ID
     #phone
     #address
@@ -79,7 +79,7 @@ def register():
                 return render_template('register.html')
             try:
                 for eemail in emails:
-                    sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
+                    sql2 = "INSERT INTO UserEmail(Email, Username) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
                     cursor.execute(sql2)
                 connection.commit()
                 session['username'] = request.form['username']
@@ -107,11 +107,11 @@ def register_visitor_buttonclick():
             try:
                 emails = request.form['email'].split(',')
                 for eemail in emails:
-                    sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
+                    sql2 = "INSERT INTO UserEmail(Email, Username) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
                     cursor.execute(sql2)
             except pymysql.err.IntegrityError:
                 flash("One of your emails is already being used. Please try again", 'alert-error')
-            sql3 = "INSERT INTO Visitor(VisUsername) VALUES ('{username}')".format(username = request.form['username'])
+            sql3 = "INSERT INTO Visitor(Username) VALUES ('{username}')".format(username = request.form['username'])
             try:
                 cursor.execute(sql3)
                 connection.commit()
@@ -140,15 +140,15 @@ def register_employee_buttonclick():
             try:
                 emails = request.form['email'].split(',')
                 for eemail in emails:
-                        sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
+                        sql2 = "INSERT INTO UserEmail(Email, Username) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
                         cursor.execute(sql2)
             except pymysql.err.IntegrityError:
                 flash("That email already exists. Please try again.", 'alert-error')
-            sql3 = "INSERT INTO Employee(EUsername, Phone, EmployeeID, Address, City, State, Zipcode) VALUES ('{username}', '{phone}', '{id}', '{address}', '{city}', '{state}', '{zipcode}');".format(username = request.form['username'], phone = request.form['phone'], id = 111, address = request.form['address'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'])
+            sql3 = "INSERT INTO Employee(Username, Phone, EmployeeID, EmployeeAddress, EmployeeCity, EmployeeState, EmployeeZipcode) VALUES ('{username}', '{phone}', '{id}', '{address}', '{city}', '{state}', '{zipcode}');".format(username = request.form['username'], phone = request.form['phone'], id = 111, address = request.form['address'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'])
             if request.form['User Type'] == "Manager":
-                sql4 = "INSERT INTO Manager(MngUsername) VALUES ('{username}')".format(username = request.form['username'])
+                sql4 = "INSERT INTO Manager(Username) VALUES ('{username}')".format(username = request.form['username'])
             else:
-                sql4 = "INSERT INTO Staff(StaffUsername) VALUES ('{username}')".format(username = request.form['username'])
+                sql4 = "INSERT INTO Staff(Username) VALUES ('{username}')".format(username = request.form['username'])
             #need to get employee ID??
             try:
                 cursor.execute(sql3)
@@ -178,16 +178,16 @@ def register_employee_visitor_buttonclick():
             try:
                 emails = request.form['email'].split(',')
                 for eemail in emails:
-                        sql2 = "INSERT INTO User_Email(UEmail, UUsername) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
+                        sql2 = "INSERT INTO UserEmail(Email, Username) VALUES ('{email}', '{username}')".format(email = eemail, username = request.form['username'])
                         cursor.execute(sql2)
             except pymysql.err.IntegrityError:
                 flash("That email already exists. Please try again.", 'alert-error')
-            sql3 = "INSERT INTO Employee(EUsername, Phone, EmployeeID, Address, City, State, Zipcode) VALUES ('{username}', '{phone}', '{id}', '{address}', '{city}', '{state}', '{zipcode}');".format(username = request.form['username'], phone = request.form['phone'], id = 111, address = request.form['address'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'])
+            sql3 = "INSERT INTO Employee(Username, Phone, EmployeeID, EmployeeAddress, EmployeeCity, EmployeeState, EmployeeZipcode) VALUES ('{username}', '{phone}', '{id}', '{address}', '{city}', '{state}', '{zipcode}');".format(username = request.form['username'], phone = request.form['phone'], id = 111, address = request.form['address'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'])
             if request.form['User Type'] == "Manager":
-                sql4 = "INSERT INTO Manager(MngUsername) VALUES ('{username}')".format(username = request.form['username'])
+                sql4 = "INSERT INTO Manager(Username) VALUES ('{username}')".format(username = request.form['username'])
             else:
-                sql4 = "INSERT INTO Staff(StaffUsername) VALUES ('{username}')".format(username = request.form['username'])
-            sql5 = "INSERT INTO Visitor(VisUsername) VALUES ('{username}')".format(username = request.form['username'])
+                sql4 = "INSERT INTO Staff(Username) VALUES ('{username}')".format(username = request.form['username'])
+            sql5 = "INSERT INTO Visitor(Username) VALUES ('{username}')".format(username = request.form['username'])
             #need to get employee ID
             try:
                 cursor.execute(sql3)
@@ -208,11 +208,11 @@ def login():
     #currently checking username and password, need to write queries to check
     #email and password
     if (request.method == 'POST'):
-        sql1 = "SELECT UUsername FROM User_Email WHERE UEmail = '{email}'".format(email = request.form['email'])
+        sql1 = "SELECT Username FROM UserEmail WHERE Email = '{email}'".format(email = request.form['email'])
         result = cursor.execute(sql1);
         username = ""
         for row in cursor:
-            username = row['UUsername']
+            username = row['Username']
         sql2 = "SELECT * FROM  User WHERE Username = '{username1}' AND Password = '{password}'".format(username1 = username, password = request.form['password'])
         result = cursor.execute(sql2);
         if result: #if any rows returned aka username was found
@@ -230,9 +230,10 @@ def login():
 #user function methods
 @app.route('/take_transit')
 def take_transit():
-    sql = "SELECT Sname FROM Site"
+    sql = "SELECT SiteName FROM Site"
     cursor.execute(sql)
     sites = cursor.fetchall()
+    print(sites)
     return render_template('user_take_transit.html', sites = sites)
 @app.route('/view_transit_history')
 def view_transit_history():
@@ -262,10 +263,10 @@ def filter_transit_buttonClick():
 def getUserType(username):
     print(username)
     #need to add visitor/user case
-    sql1 = "SELECT * FROM Manager WHERE MngUsername = '{username1}'".format(username1 = username)
-    sql2 = "SELECT * FROM Visitor WHERE VisUsername = '{username1}'".format(username1 = username)
-    sql3 = "SELECT * FROM Staff WHERE StaffUsername = '{username1}'".format(username1 = username)
-    sql4 = "SELECT * FROM Administrator WHERE AdminUsername = '{username1}'".format(username1 = username)
+    sql1 = "SELECT * FROM Manager WHERE Username = '{username1}'".format(username1 = username)
+    sql2 = "SELECT * FROM Visitor WHERE Username = '{username1}'".format(username1 = username)
+    sql3 = "SELECT * FROM Staff WHERE Username = '{username1}'".format(username1 = username)
+    sql4 = "SELECT * FROM Administrator WHERE Username = '{username1}'".format(username1 = username)
     sql5 = "SELECT * FROM User WHERE Username = '{username1}'".format(username1 = username)
     isUser = cursor.execute(sql5)
     isManager = cursor.execute(sql1)
