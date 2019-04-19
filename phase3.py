@@ -254,26 +254,63 @@ def go_to_user_type_functionality():
 #transit methods
 @app.route('/filter_transit_buttonClick',methods=['GET','POST'])
 def filter_transit_buttonClick():
+    isTransitTypeFilter = true
+    isSiteFilter =  true
+    isLPriceFilter = true
+    isHPriceFilter = true
     siteFilter = request.form['contain_site']
+    if siteFilter == "ALL":
+        isSiteFilter = false
     transportTypeFilter = request.form['transport_type']
+    if transportTypeFilter == "ALL":
+        isTransitTypeFilter = false
     lowerPriceFilter = request.form['lower']
+    if not lowerPriceFilter:
+        isLPriceFilter = false
     upperPriceFilter = request.form['upper']
-
+    if not upperPriceFilter:
+        isHPriceFilter = false
+    if (not isTransitTypeFilter and not isSiteFilter and not isLPriceFilter and not isHPriceFilter):
+        #no filters, return all history
+        sql = "SELECT * FROM TakeTransit WHERE Username = '{username}'".format(username = session['username'])
     #sql = "SELECT TransitRoute AS Route, TransitType AS Transport Type, Transit Price AS Price, COUNT(SiteName)) FROM Transit Join Connect ON Transit.TransitType = Connect.TransitType AND Transit.TransitRoute = Connect.TransitRoute WHERE ((TransitPrice BETWEEN '{lower}' AND '{upper}') AND (SiteName = '{sname}' AND TransitType = '{ttype}'));".format(lower = lowerPriceFilter, upper = upperPriceFilter, sname = siteFilter, ttype = transportTypeFilter)
     #not working rn, come back
-    sql = "SELECT * FROM Transit"
+    else:
+        sql = "SELECT * FROM Transit"
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('user_take_transit.html', data=data)
 
 @app.route('/filter_transit_history_buttonClick',methods=['GET','POST'])
 def filter_transit__history_buttonClick():
+    isTransitTypeFilter = True
+    isSiteFilter =  True
+    isEDateFilter = True
+    isSDateFilter = True
+    isRouteFilter = True
     transportTypeFilter = request.form['transport_type']
+    transportTypeFilter = request.form['transport_type']
+    if transportTypeFilter == "ALL":
+        isTransitTypeFilter = False
     siteFilter = request.form['contain_site']
+    if siteFilter == "ALL":
+        isSiteFilter = False
     routeFilter = request.form['route']
+    if not routeFilter:
+        isRouteFilter = False
     startDateFilter = request.form['start_date']
     endDateFilter = request.form['end_date']
-    sql = "SELECT * FROM Transit"
+    if not startDateFilter:
+        isSDateFilter = False
+    if not endDateFilter:
+        isEDateFilter = False
+    if not (isTransitTypeFilter and isSiteFilter and isRouteFilter and isSDateFilter and isEDateFilter):
+        sql = "SELECT TransitDate, TransitRoute, TransitType FROM TakeTransit WHERE Username = '{username}'".format(username = session['username'])
+        #get price
+    print(isTransitTypeFilter)
+    print(isSiteFilter)
+    print(isRouteFilter)
+    print(isSDateFilter)
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('user_view_transit_history.html', data=data)
