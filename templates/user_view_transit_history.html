@@ -2,7 +2,7 @@
 {% block title %} View Transit History {% endblock %}
 {% block header %} <h4>View Transit History </h4> {% endblock %}
 {% block content %}
-    <form action="/" method="post">
+    <form action="/filter_transit_history_buttonClick" method="post">
       <label>Transport Type</label>
       <select name="transport_type">
         <option value="ALL">ALL</option>
@@ -11,13 +11,14 @@
         <option value="Bike">Bike</option>
       </select>
       <label>Contain Site</label>
-      <select name="sites">
+      <select name="contain_site">
+        <option value="ALL">ALL</option>
         {% for site in sites %}
-              <option value= "{{site.SName}}" SELECTED>{{site.Sname}}</option>"
+              <option value= "{{site.SiteName}}" SELECTED>{{site.SiteName}}</option>"
           {% endfor %}
       </select>
       <p></p>
-      <label>Route:</label><input type="number" name="route">
+      <label>Route:</label><input type="text" name="route">
       <label>Start Date:</label><input type="date" name="start_date">
       <label>End Date:</label><input type="date" name="end_date">
       <p><input class="btn btn-default" type="submit" value="Filter">
@@ -26,11 +27,19 @@
     </form>
     <table style="width:100%">
       <tr>
+        <th>Date</th>
         <th>Route</th>
         <th>Transit Type</th>
         <th>Price</th>
-        <th># Connected Sites</th>
       </tr>
+      {% for item in data %}
+        <tr>
+          <td> date here </td>
+          <td>{{item.TransitRoute}}</td>
+          <td>{{item.TransitType}}</td>
+          <td>{{item.TransitPrice}}</td>
+        </tr>
+      {% endfor %}
     </table>
 
 <div>
