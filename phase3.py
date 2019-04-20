@@ -47,6 +47,10 @@ def manager_manage_staff():
 def manager_site_report():
     return render_template('manager_site_report.html')
 
+@app.route('/staff_view_schedule')
+def staff_view_schedule():
+    return render_template('staff_view_schedule.html')
+
 @app.route('/employee_manage_profile', methods=['GET','POST'])
 def employee_manage_profile():
     sql = "SELECT * FROM User WHERE Username = '{username}'".format(username = session['username'])
@@ -327,6 +331,14 @@ def filter_transit__history_buttonClick():
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('user_view_transit_history.html', data=data)
+
+#manager methods
+@app.route('/manager_site_report_buttonClick',methods=['GET','POST'])
+def manager_site_report_buttonClick():
+    render_template('manager_site_report.html')
+    #if request.form['Daily Detail']:
+        #render_template('manager_daily_detail.html')
+
 
 #helper methods
 def getUserType(username):

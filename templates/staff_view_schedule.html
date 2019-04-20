@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %} Staff View Schedule {% endblock %}
+{% block header %} <h4>Staff View Schedule</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/manager_site_report_buttonClick" method="post">
+      <label>Event Name:</label><input type="text" name="event_name">
+      <label>Description Keyword:</label><input type="text" name="description_keyword">
+      <p><label>Start Date:</label><input type="date" name="start_date">
+      <label>End Date:</label><input type="date" name="end_date"></p>
+      <p><input class="btn btn-default" type="submit" value="Filter">
+
+    </form>
+</div>
+<div>
+  <table style="width:100%">
+    <tr>
+      <th>Event Name</th>
+      <th>Site Name</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Staff Count</th>
+    </tr>
+  </table>
+  <input class="btn btn-default" type="submit" value="View Event"></p>
+</div>
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}

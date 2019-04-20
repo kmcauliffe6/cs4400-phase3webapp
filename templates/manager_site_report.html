@@ -1,9 +1,10 @@
 {% extends "layout.html" %}
 {% block title %} Manager Site Report {% endblock %}
-{% block header %} <h4>Manager Site Report</h4> {% endblock %}
+{% block header %} <h4>Manager Site Report </h4> {% endblock %}
 {% block content %}
 <div>
-    <form action="/manager_site_report_buttonClick" method="post">
+    <form action="/staff_view_schedule_buttonClick" method="post">
+
       <p><label>Start Date:</label><input type="date" name="start_date">
       <label>End Date:</label><input type="date" name="end_date"></p>
       <p><label>Total Visit Range:</label><input type="number" name="visits_lower">
