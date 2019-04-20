@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %} Visitor Event Detail {% endblock %}
+{% block header %} <h4>Visitor Event Detail </h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/staff_view_schedule_buttonClick" method="post">
+      <p><label>Event:</label>
+      <label>Site:</label>
+      <p><label>Start Date:</label>
+      <label>End Date:</label></p>
+      <label>Ticket Price ($):</label>
+      <label>Tickets Remaining:</label>
+      <label>Desciption:</label></p>
+      <label>Visit Date:</label><input type="text" name="visit_date">
+      <p><input class="btn btn-default" type="submit" value="Log Visit">
+      </p>
+    </form>
+</div>
+<div>
+    <a href="{{ url_for('visitor_explore_event') }}">Back</a>
+</div>
+{% endblock %}

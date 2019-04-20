@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %} Visitor Explore Event {% endblock %}
+{% block header %} <h4>Visitor Explore Event </h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/staff_view_schedule_buttonClick" method="post">
+      <p><label>Name:</label><input type="text" name="name">
+      <label>Description Keyword:</label><input type="text" name="description_keyword"></p>
+      <label>Site Name</label>
+      <select name="site_name">
+        <option value="ALL">ALL</option>
+
+      </select>
+      <p><label>Start Date:</label><input type="date" name="start_date">
+      <label>End Date:</label><input type="date" name="end_date"></p>
+      <p><label>Total Visit Range:</label><input type="number" name="visits_lower">
+      <label>--</label><input type="number" name="visits_upper"></p>
+        <label>Transport Type</label>
+      <p><label>Ticket Price Range:</label><input type="number" name="revenue_lower">
+        <label>--</label><input type="number" name="revenue_upper"></p>
+      <input type="checkbox" name="include_visited" value="include_visited">Include Visited<br>
+      <input type="checkbox" name="include_sold_out" value="include_sold_out">Include Sold Out Event<br>
+      <p><input class="btn btn-default" type="submit" value="Filter">
+      </p>
+    </form>
+</div>
+<form action="/staff_view_schedule_buttonClick" method="post">
+  <table style="width:100%">
+    <tr>
+      <th>Event Name</th>
+      <th>Site Name</th>
+      <th>Ticket Price</th>
+      <th>Ticket Remaining</th>
+      <th>Total Visits</th>
+      <th>My Visits</th>
+    </tr>
+    <input class="btn btn-default" type="submit" value="Event Detail">
+  </table>
+</form>
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %} Staff Event Detail {% endblock %}
+{% block header %} <h4>Staff Event Detail</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/" method="post">
+      <p><label>Event:</label>
+      <label>Site:</label></p>
+      <p><label>Start Date:</label>
+      <label>End Date:</label>
+      <label>Duration Days:</label></p>
+      <p><label>Staffs Assigned:</label>
+      <label>Capacity:</label>
+      <label>Price:</label></p>
+      <p><label>Description:</label></p>
+      <p><input class="btn btn-default" type="submit" value="Filter">
+
+    </form>
+</div>
+<div>
+    <a href="{{ url_for('staff_view_schedule') }}">Back</a>
+</div>
+{% endblock %}

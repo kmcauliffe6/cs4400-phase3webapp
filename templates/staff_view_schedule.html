@@ -13,16 +13,18 @@
     </form>
 </div>
 <div>
-  <table style="width:100%">
-    <tr>
-      <th>Event Name</th>
-      <th>Site Name</th>
-      <th>Start Date</th>
-      <th>End Date</th>
-      <th>Staff Count</th>
-    </tr>
-  </table>
-  <input class="btn btn-default" type="submit" value="View Event"></p>
+  <form action="/staff_view_event_buttonClick" method="post">
+    <table style="width:100%">
+      <tr>
+        <th>Event Name</th>
+        <th>Site Name</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Staff Count</th>
+      </tr>
+    </table>
+    <input class="btn btn-default" type="submit" value="View Event"></p>
+  </form>
 </div>
 <div>
     <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
