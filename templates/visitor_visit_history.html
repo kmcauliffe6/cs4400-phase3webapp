@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %} Visitor Visit History {% endblock %}
+{% block header %} <h4>Visitor Visit History </h4> {% endblock %}
+{% block content %}
+    <form action="/filter_visit_history" method="post">
+      <p><label>Event:</label><input type="text" name="event">
+      <label>Site</label>
+      <select name="contain_site">
+        <option value="ALL">ALL</option>
+      </select></p>
+      <p><label>Start Date:</label><input type="date" name="start_date">
+      <label>End Date:</label><input type="date" name="end_date">
+      <p><input class="btn btn-default" type="submit" value="Filter"></p>
+    </form>
+
+    </form>
+    <table style="width:100%">
+      <tr>
+        <th>Date</th>
+        <th>Event</th>
+        <th>Site</th>
+        <th>Price</th>
+      </tr>
+    </table>
+
+<div>
+    <a href="{{ url_for('go_to_user_functionality') }}">Back</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %} Visitor Transit Detail {% endblock %}
+{% block header %} <h4>Visitor Transit Detail </h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/visitor_log_visit" method="post">
+      <p><label>Site:</label>
+      <label>Open Everyday</label>
+     <label>Address</label>
+     <label>Visit Date:</label><input type="date" name="route">
+      <p><input class="btn btn-default" type="submit" value="Log Visit"></p>
+    </form>
+</div>
+<div>
+    <a href="{{ url_for('visitor_explore_site') }}">Back</a>
+</div>
+{% endblock %}

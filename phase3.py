@@ -63,6 +63,10 @@ def visitor_explore_event():
 def visitor_explore_site():
     return render_template('visitor_explore_site.html')
 
+@app.route('/visitor_visit_history')
+def visitor_visit_history():
+    return render_template('visitor_visit_history.html')
+
 @app.route('/employee_manage_profile', methods=['GET','POST'])
 def employee_manage_profile():
     sql = "SELECT * FROM User WHERE Username = '{username}'".format(username = session['username'])
