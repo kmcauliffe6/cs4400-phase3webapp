@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block title %} Manager Manage Event {% endblock %}
+{% block header %} <h4>Manager Manage Event</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/manager_manage_event" method="post">
+      <label>Name:</label><input type="text" name="name">
+      <label>Description Keyword:</label><input type="text" name="name">
+      <label>Start Date:</label><input type="date" name="start_date">
+      <label>End Date:</label><input type="date" name="end_date">
+       <p><label>Duration Range:</label><input type="number" name="duration_lower">
+        <label>--</label><input type="number" name="duration_upper"></p>
+      <p><label>Total Visit Range:</label><input type="number" name="visits_lower">
+      <label>--</label><input type="number" name="visits_upper"></p>
+        <label>Transport Type</label>
+      <p><label>Total Revenue Range:</label><input type="number" name="revenue_lower">
+        <label>--</label><input type="number" name="revenue_upper"></p>
+      <p><input class="btn btn-default" type="submit" value="Filter">
+      <input class="btn btn-default" type="submit" value="Create">
+      <input class="btn btn-default" type="submit" value="Viwe/Edit">
+      <input class="btn btn-default" type="submit" value="Delete"></p>
+    </form>
+</div>
+</form>
+<table style="width:100%">
+  <tr>
+    <th>Name</th>
+    <th>Staff Count</th>
+    <th>Duration (Days)</th>
+    <th>Total Visits</th>
+    <th>Total Revenue ($)</th>
+  </tr>
+</table>
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block title %} Administrator Manage Transit {% endblock %}
+{% block header %} <h4>Administrator Manage Transit</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/admin_manage_transit" method="post">
+        <label>Transport Type</label>
+      <select name="transport_type">
+        <option value="ALL">ALL</option>
+        <option value="MARTA">MARTA</option>
+        <option value="Bus">Bus</option>
+        <option value="Bike">Bike</option>
+      </select>
+      <label>Contain Site</label>
+      <select name="contain_site">
+        <option value="ALL">ALL</option>
+        {% for site in sites %}
+              <option value= "{{site.SiteName}}" SELECTED>{{site.SiteName}}</option>"
+          {% endfor %}
+      </select>
+      <p></p>
+      <label>Route:</label><input type="text" name="route">
+      <p><label>Price Range:</label><input type="number" name="lower">
+        <label>--</label><input type="number" name="upper"></p>
+      <p><input class="btn btn-default" type="submit" value="Filter">
+      <input class="btn btn-default" type="submit" value="Create">
+      <input class="btn btn-default" type="submit" value="Edit">
+      <input class="btn btn-default" type="submit" value="Delete"></p>
+    </form>
+</div>
+</form>
+<table style="width:100%">
+  <tr>
+    <th>Route</th>
+    <th>Transport Type</th>
+    <th>Price</th>
+    <th># Connected Sites</th>
+    <th># Transits Logged</th>
+  </tr>
+</table>
+<input class="btn btn-default" type="submit" value="Approve">
+<input class="btn btn-default" type="submit" value="Decline">
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}

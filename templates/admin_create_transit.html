@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %} Administrator Create Transit {% endblock %}
+{% block header %} <h4>Administrator Create Transit</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/admin_create_transit_buttonClick" method="post">
+      <label>Transport Type</label>
+      <select name="transport_type">
+        <option value="ALL">ALL</option>
+        <option value="MARTA">MARTA</option>
+        <option value="Bus">Bus</option>
+        <option value="Bike">Bike</option>
+     </select>
+      <label>Route:</label><input type="text" name="route">
+      <label>Price ($):</label><input type="text" name="price">
+      <label>put connected sites here</label>
+      <p><input class="btn btn-default" type="submit" value="Create"></p>
+    </form>
+</div>
+</form>
+
+<div>
+    <a href="{{ url_for('go_to_admin_manage_transit') }}">Back</a>
+</div>
+{% endblock %}

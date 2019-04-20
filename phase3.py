@@ -251,6 +251,11 @@ def go_to_user_type_functionality():
     correctpage = goToCorrectFunctionalityPage()
     return render_template('{page}'.format(page = correctpage))
 
+
+@app.route('/go_to_admin_manage_transit')
+def go_to_admin_manage_transit():
+    return render_template('admin_manage_transit.html')
+
 #transit methods
 @app.route('/filter_transit_buttonClick',methods=['GET','POST'])
 def filter_transit_buttonClick():

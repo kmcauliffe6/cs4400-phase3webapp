@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %} Administrator Manage Transit {% endblock %}
+{% block header %} <h4>Administrator Manage Transit</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/admin_edit_transit_buttonClick" method="post">
+      <label>Transport Type</label>
+      <label>Route:</label><input type="text" name="route">
+      <label>Price ($):</label><input type="text" name="price">
+      <p><input class="btn btn-default" type="submit" value="Update"></p>
+      <label>put connected sites here</label>
+    </form>
+</div>
+</form>
+
+<div>
+    <a href="{{ url_for('go_to_admin_manage_transit') }}">Back</a>
+</div>
+{% endblock %}
