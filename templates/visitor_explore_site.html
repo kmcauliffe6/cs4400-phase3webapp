@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block title %} Visitor Explore Site {% endblock %}
+{% block header %} <h4>Visitor Explore Site </h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/staff_view_schedule_buttonClick" method="post">
+      <p><label>Name:</label><input type="text" name="name">
+      <label>Open Everyday:</label>
+      <select name="open_everyday">
+        <option value="ALL">ALL</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <label>Description Keyword:</label><input type="text" name="description_keyword"></p>
+      <label>Site Name</label>
+      <select name="site_name">
+        <option value="ALL">ALL</option>
+
+      </select>
+      <p><label>Total Visits Range:</label><input type="number" name="visits_lower">
+      <label>--</label><input type="number" name="visits_upper"></p>
+        <label>Transport Type</label>
+      <p><label>Event Count Range:</label><input type="number" name="event_count_lower">
+        <label>--</label><input type="number" name="event_count_upper"></p>
+      <input type="checkbox" name="include_visited" value="include_visited">Include Visited<br>
+      <p><input class="btn btn-default" type="submit" value="Filter">
+      </p>
+    </form>
+</div>
+<form action="/visitor_explore_site_buttonClick" method="post">
+  <table style="width:100%">
+    <tr>
+      <th>Site Name</th>
+      <th>Event Count</th>
+      <th>Total Visits</th>
+      <th>My Visits</th>
+    </tr>
+    <input class="btn btn-default" type="submit" value="Site Detail">
+    <input class="btn btn-default" type="submit" value="Transit Detail">
+  </table>
+</form>
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}

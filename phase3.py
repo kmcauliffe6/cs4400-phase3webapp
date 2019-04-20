@@ -51,7 +51,6 @@ def manager_site_report():
 def staff_view_schedule():
     return render_template('staff_view_schedule.html')
 
-
 @app.route('/staff_view_event_buttonClick')
 def staff_view_event_buttonClick():
     return render_template('staff_view_event.html')
@@ -59,6 +58,10 @@ def staff_view_event_buttonClick():
 @app.route('/visitor_explore_event')
 def visitor_explore_event():
     return render_template('visitor_explore_event.html')
+
+@app.route('/visitor_explore_site')
+def visitor_explore_site():
+    return render_template('visitor_explore_site.html')
 
 @app.route('/employee_manage_profile', methods=['GET','POST'])
 def employee_manage_profile():

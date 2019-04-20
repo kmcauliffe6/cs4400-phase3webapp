@@ -3,6 +3,15 @@
 {% block header %} <h4>Visitor Functionality</h4> {% endblock %}
 {% block content %}
 <div>
+    <a href="{{ url_for('visitor_explore_event') }}">Explore Event</a>
+</div>
+<div>
+    <a href="{{ url_for('visitor_explore_site') }}">Explore Site</a>
+</div>
+<div>
+    <a href="{{ url_for('take_transit') }}">View Visit History</a>
+</div>
+<div>
     <a href="{{ url_for('take_transit') }}">Take Transit</a>
 </div>
 <div>
