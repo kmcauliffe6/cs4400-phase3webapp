@@ -25,23 +25,26 @@
     </form>
 
     </form>
-    <table style="width:100%">
-      <tr>
-        <th>Date</th>
-        <th>Route</th>
-        <th>Transit Type</th>
-        <th>Price</th>
-      </tr>
-      {% for item in data %}
-        <tr>
-          <td>{{item.TransitDate}}</td>
-          <td>{{item.TransitRoute}}</td>
-          <td>{{item.TransitType}}</td>
-          <td>get price</td>
-        </tr>
-      {% endfor %}
-    </table>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <h2>Portfolio List</h2>
+     <ul>
+         <table style="width:100%">
+         <tr>
+             <th>Date</th>
+            <th>Route</th>
+            <th>Transit Type</th>
+            <th>Price</th>
+         </tr>
+        {% for item in data %}
+        <tr class='clickable-row' data-href="{{ url_for('portfolio') }}" method = POST>
+             <td>{{item.TransitDate}}</td>
+            <td>{{item.TransitRoute}}</td>
+            <td>{{item.TransitType}}</td>
+            <td>get price</td>
+         </tr>
+        {% endfor %}
+        </table>
+    </ul>
 <div>
     <a href="{{ url_for('go_to_user_functionality') }}">Back</a>
 </div>
