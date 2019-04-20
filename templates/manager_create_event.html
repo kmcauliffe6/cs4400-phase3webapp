@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %} Manager Manage Event {% endblock %}
+{% block header %} <h4>Manager Manage Event</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/manager_manage_event" method="post">
+      <p><label>Name:</label><input type="text" name="name">
+      <label>Price:</label><input type="number" name="price">
+      <label>Capacity:</label><input type="number" name="capacity">
+      <label>Minimum Staff Required:</label><input type="number" name="min_staff"></p>
+      <label>Start Date:</label><input type="date" name="start_date">
+      <label>End Date:</label><input type="date" name="end_date">
+
+      <label>Description:</label><input type="text" name="description">
+      <label>Assign Staff Here</label>
+
+      <p><input class="btn btn-default" type="submit" value="Create"></p>
+    </form>
+</div>
+
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}

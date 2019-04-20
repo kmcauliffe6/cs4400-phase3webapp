@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %} Manager Site Report {% endblock %}
+{% block header %} <h4>Manager Site Report</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/manager_site_report_buttonClick" method="post">
+      <p><label>Start Date:</label><input type="date" name="start_date">
+      <label>End Date:</label><input type="date" name="end_date"></p>
+      <p><label>Total Visit Range:</label><input type="number" name="visits_lower">
+      <label>--</label><input type="number" name="visits_upper"></p>
+        <label>Transport Type</label>
+      <p><label>Total Revenue Range:</label><input type="number" name="revenue_lower">
+        <label>--</label><input type="number" name="revenue_upper"></p>
+      <p><input class="btn btn-default" type="submit" value="Filter">
+      <input class="btn btn-default" type="submit" value="Daily Detail"></p>
+    </form>
+</div>
+<table style="width:100%">
+  <tr>
+    <th>Date</th>
+    <th>Event Count</th>
+    <th>Staff Count</th>
+    <th>Total Visits</th>
+    <th>Total Revenue ($)</th>
+  </tr>
+</table>
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}

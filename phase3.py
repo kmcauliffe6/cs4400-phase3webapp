@@ -39,6 +39,14 @@ def register_employee():
 def register_employee_visitor():
     return render_template('register_employee_visitor.html')
 
+@app.route('/manager_manage_staff')
+def manager_manage_staff():
+    return render_template('manager_manage_staff.html')
+
+@app.route('/manager_site_report')
+def manager_site_report():
+    return render_template('manager_site_report.html')
+
 @app.route('/employee_manage_profile', methods=['GET','POST'])
 def employee_manage_profile():
     sql = "SELECT * FROM User WHERE Username = '{username}'".format(username = session['username'])

@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %} Manager Manage Staff {% endblock %}
+{% block header %} <h4>Manager Manage Staff</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/manager_manage_staff_buttonClick" method="post">
+      <label>Site</label>
+      <select name="site">
+     </select>
+      <p><label>First Name:</label><input type="text" name="first_name">
+      <label>Last Name:</label><input type="text" name="last_name"></p>
+      <p><label>Start Date:</label><input type="date" name="start_date">
+      <label>End Date:</label><input type="date" name="end_date"></p>
+      <p><input class="btn btn-default" type="submit" value="Filter"></p>
+    </form>
+</div>
+<table style="width:100%">
+  <tr>
+    <th>Staff Name</th>
+    <th># Event Shifts</th>
+  </tr>
+</table>
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}

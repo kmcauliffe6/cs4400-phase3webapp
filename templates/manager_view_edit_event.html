@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %} Manager View/Edit Event {% endblock %}
+{% block header %} <h4>Manager View/Edit Event</h4> {% endblock %}
+{% block content %}
+<div>
+    <form action="/manager_manage_event" method="post">
+      <label>Name:</label>
+      <label>Price:</label>
+      <label>Start Date:</label>
+      <label>End Date:</label>
+      <label>Minimum Staff Required:</label>
+      <label>Capacity:</label>
+      <label>Staff Assigned: (table here)</label>
+
+      <label>Description:</label>
+
+      <p><label>Daily Visits Range:</label><input type="number" name="visits_lower">
+      <label>--</label><input type="number" name="visits_upper"></p>
+      <p><label>Daily Revenue Range:</label><input type="number" name="revenue_lower">
+        <label>--</label><input type="number" name="revenue_upper"></p>
+      <p><input class="btn btn-default" type="submit" value="Filter">
+      <input class="btn btn-default" type="submit" value="Update"></p>
+    </form>
+</div>
+<table style="width:100%">
+  <tr>
+    <th>Date</th>
+    <th>Daily Visits</th>
+    <th>Daily Revenue ($)</th>
+  </tr>
+</table>
+<div>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+</div>
+{% endblock %}
