@@ -6,22 +6,21 @@
     <form action="/admin_create_transit_buttonClick" method="post">
       <label>Transport Type</label>
       <select name="transport_type">
-        <option value="ALL">ALL</option>
         <option value="MARTA">MARTA</option>
         <option value="Bus">Bus</option>
         <option value="Bike">Bike</option>
      </select>
-     <p><h5>Connected Sites</h5>
+
+     <p><h5>Connected Sites To Choose From</h5>
         <select name="site">
           <option value="ALL">ALL</option>
           {% for site in sites %}
               <option value= "{{site.SiteName}}">{{site.SiteName}}</option>"
           {% endfor %}
-        </select>
-
-      <label>Route:</label><input type="text" name="route">
+        </select></p>
+      <label>Connected Sites (Write Out, Separated by Commas):</label><input type="text" name="sites">
+      <p><label>Route:</label><input type="text" name="route"></p>
       <label>Price ($):</label><input type="text" name="price">
-      <label>put connected sites here</label>
       <p><input class="btn btn-default" type="submit" value="Create"></p>
     </form>
 </div>

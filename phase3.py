@@ -623,8 +623,30 @@ def admin_manage_transit_create_edit_delete():
         sites = cursor.fetchall()
         return render_template('admin_create_transit.html', sites = sites)
 
+#not currently working, can't figure out why
 @app.route('/admin_create_transit_buttonClick',methods=['GET','POST'])
 def admin_create_transit_buttonClick():
+    sites = request.form['sites'].split(',')
+    if len(sites) < 2:
+        get_connected_sites = "SELECT SiteName FROM Site"
+        cursor.execute(get_connected_sites)
+        sites = cursor.fetchall()
+        flash("Must Select As Least 2 Connecting Sites.", 'alert-error')
+        return render_template('admin_create_transit.html', sites = sites)
+    try:
+        sql = "INSERT INTO Transit(TransitType, TransitRoute, TransitPrice) VALUES ('{type}', '{route}', '{price}')".format(type = request.form['transport_type'], route = request.form['route'], price = request.form['price'])
+        cursor.execute(sql)
+        for site in sites:
+            print(site)
+            sql = "INSERT INTO CONNECT(SiteName, TransitType, TransitRoute) VALUES ('{name}', '{type}', '{route}')".format(name = site, type = request.form['transport_type'], route = request.form['route'])
+            cursor.execute(sql)
+    except pymysql.err.IntegrityError:
+        get_connected_sites = "SELECT SiteName FROM Site"
+        cursor.execute(get_connected_sites)
+        sites = cursor.fetchall()
+        flash("Route and Transport Type Combo Must Be Unique", 'alert-error')
+        return render_template('admin_create_transit.html', sites = sites)
+    return render_template("admin_manage_transit.html")
 
 #helper methods
 def getUserType(username):
