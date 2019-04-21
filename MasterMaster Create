@@ -143,11 +143,11 @@ CREATE TABLE Visit_Event
 	ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE VIEW TransitConnectView AS
-SELECT T.TransitType, T.TransitRoute, T.TransitPrice, C.SiteName, tmp.CountSites as CountSites
-    FROM Transit AS T JOIN Connect AS C
-                      ON (T.TransitType, T.TransitRoute) = (C.TransitType, C.TransitRoute) 
+SELECT Transit.TransitType, Transit.TransitRoute, Transit.TransitPrice, Connect.SiteName, tmp.num_sites as CountSites
+    FROM Transit JOIN Connect
+                      ON (Transit.TransitType, Transit.TransitRoute) = (Connect.TransitType, Connect.TransitRoute) 
                       JOIN (SELECT TransitType, TransitRoute, count(*) AS CountSites FROM connect GROUP BY TransitType, TransitRoute) AS tmp 
-                      ON (T.TransitType, T.TransitRoute) = (tmp.TransitType, tmp.TransitRoute);
+                      ON (Transit.TransitType, Transit.TransitRoute) = (tmp.TransitType, tmp.TransitRoute);
 
 CREATE VIEW EmployeeProfileView AS
 SELECT Employee.Username, Employee.EmployeeID, Employee.Phone, Concat(Employee.EmployeeAddress, ', ', Employee.EmployeeCity, ' ', Employee.EmployeeState, ', ', Employee.EmployeeZipcode) as Address FROM Employee;
