@@ -143,9 +143,9 @@ CREATE TABLE Visit_Event
 	ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE VIEW TransitConnectView AS
-SELECT Transit.TransitType, Transit.TransitRoute, Transit.TransitPrice, Connect.SiteName, tmp.CountSites as CountSites
-    FROM Transit JOIN Connect
-                      ON (Transit.TransitType, Transit.TransitRoute) = (Connect.TransitType, Connect.TransitRoute) 
+SELECT T.TransitType, T.TransitRoute, T.TransitPrice, C.SiteName, tmp.CountSites as CountSites
+    FROM Transit AS T JOIN Connect AS C
+                      ON (T.TransitType, T.TransitRoute) = (C.TransitType, C.TransitRoute) 
                       JOIN (SELECT TransitType, TransitRoute, count(*) AS CountSites FROM connect GROUP BY TransitType, TransitRoute) AS tmp 
                       ON (T.TransitType, T.TransitRoute) = (tmp.TransitType, tmp.TransitRoute);
 
