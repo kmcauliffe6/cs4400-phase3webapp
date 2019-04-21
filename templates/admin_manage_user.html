@@ -3,7 +3,7 @@
 {% block header %} <h4>Manage User</h4> {% endblock %}
 {% block content %}
 <div>
-    <form action="/update_profile" method="post">
+    <form action="/admin_manage_user" method="post">
         <label>Username:</label><input type="text" name="first_name">
         <p><h5>Type</h5>
         <select name="user_type">
@@ -31,6 +31,13 @@
     <th>User Type</th>
     <th>Status</th>
   </tr>
+  {% for item in data %}
+       <td>{{item.TransitDate}}</td>
+      <td>{{item.TransitRoute}}</td>
+      <td>{{item.TransitType}}</td>
+      <td>{{item.TransitPrice}}</td>
+    </tr>
+  {% endfor %}
 </table>
 <input class="btn btn-default" type="submit" value="Approve">
 <input class="btn btn-default" type="submit" value="Decline">

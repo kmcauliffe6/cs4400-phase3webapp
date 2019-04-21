@@ -1,6 +1,6 @@
 import pymysql
 from flask import Flask, request, render_template, redirect, url_for, flash, session
-
+import random
 app = Flask(__name__)
 connection = pymysql.connect(host='localhost',
                              user='root',
@@ -76,14 +76,84 @@ def employee_manage_profile():
     first_name = userdetails['Firstname']
     last_name = userdetails['Lastname']
     username = userdetails['Username']
+    get_site_name = "SELECT SiteName FROM Site WHERE ManagerUsername = '{username}'".format(username = username)
+    cursor.execute(get_site_name)
+    sitename = ""
+    for row in cursor:
+        sitename = row['SiteName']
+    get_employee_id = "SELECT EmployeeID, EmployeeAddress, Phone FROM Employee WHERE Username = '{username}'".format(username = username)
+    cursor.execute(get_employee_id)
+    emp_id = 0
+    address = ""
+    phone = 0
+    for row in cursor:
+        emp_id = row['EmployeeID']
+        address = row['EmployeeAddress']
+        phone = row['Phone']
+    get_emails = "SELECT Email FROM UserEmail WHERE Username = '{username}'".format(username = username)
+    cursor.execute(get_emails)
+    emails = []
+    for row in cursor:
+        emails.append(row['Email'])
     #site name
-    #sql1 =
     #employee ID
     #phone
     #address
     #emails
-    data = [first_name, last_name, username]
+    data = [first_name, last_name, username, phone, sitename, emp_id, address, emails]
     return render_template('manage_profile.html', data=data)
+
+@app.route('/update_profile', methods=['GET','POST'])
+def update_profile():
+    if not request.form['phone'] == '':
+        sql = "UPDATE Employee SET Phone = '{phone}' WHERE Username = '{username}'".format(phone = request.form['phone'], username = session['username'])
+        cursor.execute(sql)
+    if not request.form['first_name'] == '':
+        sql = "UPDATE User SET Firstname = '{name}' WHERE Username = '{username}'".format(name = request.form['first_name'], username = session['username'])
+        cursor.execute(sql)
+    if not request.form['last_name'] == '':
+        sql = "UPDATE User SET Lastname = '{name}' WHERE Username = '{username}'".format(name = request.form['last_name'], username = session['username'])
+        cursor.execute(sql)
+
+    #if not request.form['email'] == '': email update not working yet!!
+
+
+
+    #reset values on screen
+    sql = "SELECT * FROM User WHERE Username = '{username}'".format(username = session['username'])
+    cursor.execute(sql);
+    userdetails = cursor.fetchone()
+    print(userdetails)
+    first_name = userdetails['Firstname']
+    last_name = userdetails['Lastname']
+    username = userdetails['Username']
+    get_site_name = "SELECT SiteName FROM Site WHERE ManagerUsername = '{username}'".format(username = username)
+    cursor.execute(get_site_name)
+    sitename = ""
+    for row in cursor:
+        sitename = row['SiteName']
+    get_employee_id = "SELECT EmployeeID, EmployeeAddress, Phone FROM Employee WHERE Username = '{username}'".format(username = username)
+    cursor.execute(get_employee_id)
+    emp_id = 0
+    address = ""
+    phone = 0
+    for row in cursor:
+        emp_id = row['EmployeeID']
+        address = row['EmployeeAddress']
+        phone = row['Phone']
+    get_emails = "SELECT Email FROM UserEmail WHERE Username = '{username}'".format(username = username)
+    cursor.execute(get_emails)
+    emails = []
+    for row in cursor:
+        emails.append(row['Email'])
+    #site name
+    #employee ID
+    #phone
+    #address
+    #emails
+    data = [first_name, last_name, username, phone, sitename, emp_id, address, emails]
+    return render_template('manage_profile.html', data= data)
+
 
 @app.route('/admin_manage_user', methods=['GET','POST'])
 def admin_manage_user():
@@ -97,9 +167,9 @@ def register():
             flash("Passwords need to match", 'alert-error')
         else:
             emails = request.form['email'].split(',')
-            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
+            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status, UserType) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}', '{usertype}');".format(username = request.form['username'],
                 last_name = request.form['last_name'], first_name = request.form['first_name'],
-                password = request.form['password'], status = "Not Approved")
+                password = request.form['password'], status = "Not Approved", usertype = "user")
             try:
                 cursor.execute(sql)
             except pymysql.err.IntegrityError:
@@ -125,9 +195,9 @@ def register_visitor_buttonclick():
         if request.form['password'] != request.form['confirm_password']:
             flash("Passwords need to match", 'alert-error')
         else:
-            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
+            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status, UserType) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}', '{usertype}');".format(username = request.form['username'],
                 last_name = request.form['last_name'], first_name = request.form['first_name'],
-                password = request.form['password'], status = "Not Approved")
+                password = request.form['password'], status = "Not Approved", usertype = "visitor")
             try:
                 cursor.execute(sql)
             except pymysql.err.IntegrityError:
@@ -144,6 +214,7 @@ def register_visitor_buttonclick():
                 cursor.execute(sql3)
                 connection.commit()
                 session['email'] = request.form['email']
+                session['username'] = request.form['username']
                 getUserType(request.form['username'])
                 correctpage = goToCorrectFunctionalityPage()
                 return render_template('{page}'.format(page = correctpage))
@@ -158,9 +229,9 @@ def register_employee_buttonclick():
         if request.form['password'] != request.form['confirm_password']:
             flash("Passwords need to match", 'alert-error')
         else:
-            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
+            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status, UserType) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}', '{usertype}');".format(username = request.form['username'],
                 last_name = request.form['last_name'], first_name = request.form['first_name'],
-                password = request.form['password'], status = "Not Approved")
+                password = request.form['password'], status = "Not Approved", usertype = request.form['User Type'])
             try:
                 cursor.execute(sql)
             except pymysql.err.IntegrityError:
@@ -172,7 +243,7 @@ def register_employee_buttonclick():
                         cursor.execute(sql2)
             except pymysql.err.IntegrityError:
                 flash("That email already exists. Please try again.", 'alert-error')
-            sql3 = "INSERT INTO Employee(Username, Phone, EmployeeID, EmployeeAddress, EmployeeCity, EmployeeState, EmployeeZipcode) VALUES ('{username}', '{phone}', '{id}', '{address}', '{city}', '{state}', '{zipcode}');".format(username = request.form['username'], phone = request.form['phone'], id = 111, address = request.form['address'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'])
+            sql3 = "INSERT INTO Employee(Username, Phone, EmployeeID, EmployeeAddress, EmployeeCity, EmployeeState, EmployeeZipcode) VALUES ('{username}', '{phone}', '{id}', '{address}', '{city}', '{state}', '{zipcode}');".format(username = request.form['username'], phone = request.form['phone'], id = random.randint(1, 999999999), address = request.form['address'], city = request.form['city'], state = request.form['state'], zipcode = request.form['zipcode'])
             if request.form['User Type'] == "Manager":
                 sql4 = "INSERT INTO Manager(Username) VALUES ('{username}')".format(username = request.form['username'])
             else:
@@ -183,6 +254,7 @@ def register_employee_buttonclick():
                 cursor.execute(sql4)
                 connection.commit()
                 session['email'] = request.form['email']
+                session['username'] = request.form['username']
                 getUserType(request.form['username'])
                 correctpage = goToCorrectFunctionalityPage()
                 return render_template('{page}'.format(page = correctpage))
@@ -197,7 +269,7 @@ def register_employee_visitor_buttonclick():
             flash("Passwords need to match", 'alert-error')
         else:
             sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
-                last_name = request.form['last_name'], first_name = request.form['first_name'],
+                last_name = request.form['last_name'], first_name = request.form['first_name'], usertype = request.form['User Type'],
                 password = request.form['password'], status = "Not Approved")
             try:
                 cursor.execute(sql)
@@ -223,6 +295,7 @@ def register_employee_visitor_buttonclick():
                 cursor.execute(sql5)
                 connection.commit()
                 session['email'] = request.form['email']
+                session['username'] = request.form['username']
                 getUserType(request.form['username'])
                 correctpage = goToCorrectFunctionalityPage()
                 return render_template('{page}'.format(page = correctpage))
@@ -248,6 +321,8 @@ def login():
             session['email'] = row.get('email') #keep track of current user
             getUserType(username)
             correctpage = goToCorrectFunctionalityPage()
+            session['username'] = username
+            session['email'] = request.form['email']
             print(username)
             print(session['user_type'])
             return render_template('{page}'.format(page = correctpage))
@@ -287,87 +362,65 @@ def go_to_admin_manage_transit():
 #transit methods
 @app.route('/filter_transit_buttonClick',methods=['GET','POST'])
 def filter_transit_buttonClick():
-    isTransitTypeFilter = True
-    isSiteFilter =  True
-    isLPriceFilter = True
-    isHPriceFilter = True
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
     siteFilter = request.form['contain_site']
-    if siteFilter == "ALL":
-        isSiteFilter = False
     transportTypeFilter = request.form['transport_type']
-    if transportTypeFilter == "ALL":
-        isTransitTypeFilter = False
     lowerPriceFilter = request.form['lower']
-    if not lowerPriceFilter:
-        isLPriceFilter = False
     upperPriceFilter = request.form['upper']
-    if not upperPriceFilter:
-        isHPriceFilter = False
-    print(isTransitTypeFilter)
-    print(isSiteFilter)
-    data = []
-    if (not isTransitTypeFilter and not isSiteFilter and not isLPriceFilter and not isHPriceFilter):
-        #no filters, return all history
-        sql = "SELECT * FROM TakeTransit WHERE Username = '{username}'".format(username = session['username'])
-        result = cursor.execute(sql)
-        for row in cursor:
-            transitRoute = row['TransitRoute']
-            transitType = row['TransitType']
-            sql2 = "Select TransitPrice FROM Transit WHERE TransitType = '{type}' AND TransitRoute = '{route}'".format(type = transitType, route = transitRoute)
-            cursor.execute(sql2)
-            price = cursor.fetchone()['TransitPrice']
-            sql3 = "Select Count(*) FROM Transit WHERE TransitRoute = '{route}'".format(route = transitRoute)
-            cursor.execute(sql3)
-            connections = cursor.fetchone()['Count(*)']
-            numconnections = connections - 1 #take away this connectioon
-            data.append((transitRoute, transitType, price, numconnections))
-            print(data)
-            print("data is")
-            print(data)
-        return render_template('user_take_transit.html', data = data)
-
-    #sql = "SELECT TransitRoute AS Route, TransitType AS Transport Type, Transit Price AS Price, COUNT(SiteName)) FROM Transit Join Connect ON Transit.TransitType = Connect.TransitType AND Transit.TransitRoute = Connect.TransitRoute WHERE ((TransitPrice BETWEEN '{lower}' AND '{upper}') AND (SiteName = '{sname}' AND TransitType = '{ttype}'));".format(lower = lowerPriceFilter, upper = upperPriceFilter, sname = siteFilter, ttype = transportTypeFilter)
+    load_sites = "SELECT TransitRoute, TransitType, TransitPrice, NumSites as '# Connected Sites' FROM transit_connect WHERE 1=1"
+    if not (transportTypeFilter == "ALL" or transportTypeFilter == ''):
+        load_sites += " AND TransitType = '{type}'".format(type = transportTypeFilter)
+    if not (siteFilter == "ALL" or siteFilter == ''):
+        load_sites += " AND SiteName = '{site}'".format(site = siteFilter)
+    if (not lowerPriceFilter == ''):
+        load_sites += " AND TransitPrice >= '{lower}'".format(lower = lowerPriceFilter)
+    if (not upperPriceFilter == ''):
+        load_sites += " AND TransitPrice <= '{upper}'".format(upper = upperPriceFilter)
     #not working rn, come back
-    else:
-        print("in else")
-        sql = "SELECT * FROM Transit"
-        cursor.execute(sql)
-        data = cursor.fetchall()
-        return render_template('user_take_transit.html', data=data)
+    print(load_sites)
+    cursor.execute(load_sites)
+    data = cursor.fetchall()
+    return render_template('user_take_transit.html', data = data, sites = sites)
 
 @app.route('/filter_transit_history_buttonClick',methods=['GET','POST'])
 def filter_transit__history_buttonClick():
-    isTransitTypeFilter = True
-    isSiteFilter =  True
-    isEDateFilter = True
-    isSDateFilter = True
-    isRouteFilter = True
+    sites = "SELECT SiteName FROM Site"
+    cursor.execute(sites)
+    sites = cursor.fetchall()
+    #cursor.execute(contain_site)
     transportTypeFilter = request.form['transport_type']
-    transportTypeFilter = request.form['transport_type']
-    if transportTypeFilter == "ALL":
-        isTransitTypeFilter = False
     siteFilter = request.form['contain_site']
-    if siteFilter == "ALL":
-        isSiteFilter = False
     routeFilter = request.form['route']
-    if not routeFilter:
-        isRouteFilter = False
+    sql = "SELECT TransitDate, TransitRoute, TransitType, TransitPrice FROM transit_connect NATURAL JOIN TakeTransit WHERE Username = '{username}'".format(username = session['username'])
+    if not (transportTypeFilter == '' or transportTypeFilter ==  "ALL"):
+        sql += " AND TransitType = '{type}'".format(type = transportTypeFilter)
+    if not (siteFilter == "ALL" or siteFilter == ''):
+        sql += " AND SiteName = '{site}'".format(site = siteFilter)
+    if not routeFilter == '':
+        sql += " AND TransitRoute = '{route}'".format(route = routeFilter)
     startDateFilter = request.form['start_date']
     endDateFilter = request.form['end_date']
-    if not startDateFilter:
-        isSDateFilter = False
-    if not endDateFilter:
-        isEDateFilter = False
-    if not (isTransitTypeFilter and isSiteFilter and isRouteFilter and isSDateFilter and isEDateFilter):
-        sql = "SELECT TransitDate, TransitRoute, TransitType FROM TakeTransit WHERE Username = '{username}'".format(username = session['username'])
-        #get price
-    print(isTransitTypeFilter)
-    print(isSiteFilter)
-    print(isRouteFilter)
-    print(isSDateFilter)
+    if not startDateFilter == '':
+        sql += " AND TransitDate >= '{lower}'".format(lower = startDateFilter)
+    if not endDateFilter == '':
+        sql += " AND TransitDate <= '{upper}'".format(upper = endDateFilter)
+    print(sql)
     cursor.execute(sql)
     data = cursor.fetchall()
-    return render_template('user_view_transit_history.html', data=data)
+    return render_template('user_view_transit_history.html', data=data, sites = sites)
+
+
+@app.route('/log_transit_buttonClick',methods=['GET','POST'])
+def log_transit_buttonClick():
+    row = request.form['selected_transit'].split(,)
+    route = row[0]
+
+    sql = "INSERT INTO TakeTransit(Username, TransitType, TransitRoute, TransitDate) VALUES ('{username}', '{type}', '{route}', '{date}'".format(username = session['username'], type = type, route = route, date = request.form['transit_date'])
+    cursor.execute(sql)
+    return render_template('user_take_transit.html')
+
 
 #manager methods
 @app.route('/manager_site_report_buttonClick',methods=['GET','POST'])
@@ -437,6 +490,27 @@ def goToCorrectFunctionalityPage():
 if __name__ == "__main__":
     app.secret_key = 'supersecretkey'
     app.run(debug=True)
+
+#admin methods
+@app.route('/admin_manage_user',methods=['GET','POST'])
+def admin_manage_user():
+    #initial load of table
+    sql = "SELECT Username, COUNT(Email) AS 'Email Count', UserType, Status FROM User NATURAL JOIN UserEmail GROUP BY Username"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('admin_manage_user.html', data = data)
+
+@app.route('/admin_manage_site',methods=['GET','POST'])
+def admin_manage_site():
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    #initial load of table
+    sql = "SELECT SiteName, Manager, OpenEveryday FROM Site AS s JOIN (SELECT ManagerUsername, Concat(FirstName, ' ', LastName) as Manager FROM Manager JOIN user ON ManagerUsername = Username) as tmp ON tmp.ManagerUsername = s.ManagerUsername"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    session['current_data'] = data
+    return render_template('admin_manage_site.html', data = data, sites = sites)
 
 
 

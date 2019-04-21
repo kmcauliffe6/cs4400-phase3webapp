@@ -27,10 +27,19 @@
     <th>Manager</th>
     <th>Open Everyday</th>
   </tr>
+  {% for item in data %}
+       <td>{{item.SiteName}}</td>
+      <td>{{item.Manager}}</td>
+      <td>{{item.OpenEveryday}}</td>
+    </tr>
+  {% endfor %}
 </table>
-<input class="btn btn-default" type="submit" value="Create">
-<input class="btn btn-default" type="submit" value="Edit">
-<input class="btn btn-default" type="submit" value="Delete">
+<form action="/admin_manage_site_buttonClick" method="post">
+  <input class="btn btn-default" type="submit" value="Create">
+  <input class="btn btn-default" type="submit" value="Edit">
+  <input class="btn btn-default" type="submit" value="Delete">
+  <label>Table Entry to Update (1 to X) </label><input type="number" name="first_name">
+</form>
 <div>
     <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
 </div>

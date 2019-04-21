@@ -21,30 +21,30 @@
         <label>--</label><input type="number" name="upper"></p>
          <p><input class="btn btn-default" type="submit" value="Filter">
     </form>
-    <table style="width:100%">
+
+    <form action="/log_transit_buttonClick" method="post">
+      <table style="width:100%">
       <tr>
         <th>Route</th>
         <th>Transit Type</th>
         <th>Price</th>
         <th># Connected Sites</th>
       </tr>
-      {% for item in data %}
-        <tr>
-          <td>{{item.0}}</td>
-          <td>{{item.1}}</td>
-          <td>{{item.2}}</td>
-          <td>{{item.3}}</td>
+       <select name="selected_transit" method="GET" action="/">
+        {% for item in data %}
+          <option value = {{item['TransitRoute']}},{{item['TransitType']}},{{item['TransitPrice']}},{{item['# Connected Sites']}}>Route: {{item['TransitRoute']}} Type:{{item['TransitType']}} Price: {{item['TransitPrice']}} Connected Sites: {{item['# Connected Sites']}}</option>
+
         </tr>
       {% endfor %}
-    </table>
-    <form action="/log_transit_buttonClick" method="post">
+       </select>
         <label>Transit Date</label><input type="date" name="transit_date"></p>
-        <p><input class="btn btn-default" type="submit" value="Log Transit">
+        <p><input class="btn btn-default" type="submit" value="log_transit">
     </form>
 
 <div>
     <a href="{{ url_for('go_to_user_functionality') }}">Back</a>
 </div>
+
 
 
 
