@@ -32,13 +32,12 @@
       </tr>
        <select name="selected_transit" method="GET" action="/">
         {% for item in data %}
-          <option value = {{item['TransitRoute']}},{{item['TransitType']}},{{item['TransitPrice']}},{{item['# Connected Sites']}}>Route: {{item['TransitRoute']}} Type:{{item['TransitType']}} Price: {{item['TransitPrice']}} Connected Sites: {{item['# Connected Sites']}}</option>
-
+          <option value = "{{item['TransitRoute']}},{{item['TransitType']}},{{item['TransitPrice']}},{{item['# Connected Sites']}}">Route: {{item['TransitRoute']}} Type:{{item['TransitType']}} Price: {{item['TransitPrice']}} Connected Sites: {{item['# Connected Sites']}}</option>
         </tr>
       {% endfor %}
        </select>
         <label>Transit Date</label><input type="date" name="transit_date"></p>
-        <p><input class="btn btn-default" type="submit" value="log_transit">
+        <p><input class="btn btn-default" type="submit" value="Log Transit">
     </form>
 
 <div>

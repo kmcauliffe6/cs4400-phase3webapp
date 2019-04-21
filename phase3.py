@@ -5,7 +5,7 @@ app = Flask(__name__)
 connection = pymysql.connect(host='localhost',
                              user='root',
                              passwd='13',
-                             db='phase3data',
+                             db='phase3final',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 cursor = connection.cursor()
@@ -414,10 +414,13 @@ def filter_transit__history_buttonClick():
 
 @app.route('/log_transit_buttonClick',methods=['GET','POST'])
 def log_transit_buttonClick():
-    row = request.form['selected_transit'].split(,)
+    tablerow = request.form['selected_transit']
+    print(tablerow)
+    row = tablerow.split(',')
     route = row[0]
-
-    sql = "INSERT INTO TakeTransit(Username, TransitType, TransitRoute, TransitDate) VALUES ('{username}', '{type}', '{route}', '{date}'".format(username = session['username'], type = type, route = route, date = request.form['transit_date'])
+    type = row[1]
+    sql = "INSERT INTO TakeTransit(Username, TransitType, TransitRoute, TransitDate) VALUES ('{username}', '{type}', '{route}', '{date}')".format(username = session['username'], type = type, route = route, date = request.form['transit_date'])
+    print(sql)
     cursor.execute(sql)
     return render_template('user_take_transit.html')
 
