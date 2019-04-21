@@ -3,42 +3,39 @@
 {% block header %} <h4>Admin Manage Site</h4> {% endblock %}
 {% block content %}
 <div>
-    <form action="/admin_manage_site_filterClick" method="post">
+    <form action="/admin_manage_site_filter_buttonClick" method="post">
         <p><h5>Site</h5>
-          <option value="ALL">ALL</option>
         <select name="site">
+          <option value="ALL">ALL</option>
+          {% for site in sites %}
+              <option value= "{{site.SiteName}}">{{site.SiteName}}</option>"
+          {% endfor %}
         </select>
         <p><h5>Manager</h5>
         <select name="manager">
           <option value="ALL">ALL</option>
+          {% for man in mans %}
+              <option value= "{{man.Manager}}">{{man.Manager}}</option>"
+          {% endfor %}
         </select>
         <p><h5>Open Everyday</h5>
         <select name="open_everyday">
-          <option value="Yes">ALL</option>
-          <option value="No">ALL</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
         </select>
         <input class="btn btn-default" type="submit" value="Filter">
     </form>
 </div>
 </form>
-<table style="width:100%">
-  <tr>
-    <th>Name</th>
-    <th>Manager</th>
-    <th>Open Everyday</th>
-  </tr>
-  {% for item in data %}
-       <td>{{item.SiteName}}</td>
-      <td>{{item.Manager}}</td>
-      <td>{{item.OpenEveryday}}</td>
-    </tr>
-  {% endfor %}
-</table>
 <form action="/admin_manage_site_buttonClick" method="post">
+   <select name="selected_site" method="GET" action="/">
+        {% for item in data %}
+          <option value = "{{item.SiteName}},{{item.Manager}},{{item.OpenEveryday}}">Site Name: {{item.SiteName}}, Manager: {{item.Manager}}, Open Everyday: {{item.OpenEveryday}}</option>
+      {% endfor %}
+       </select>
   <input class="btn btn-default" type="submit" value="Create">
   <input class="btn btn-default" type="submit" value="Edit">
   <input class="btn btn-default" type="submit" value="Delete">
-  <label>Table Entry to Update (1 to X) </label><input type="number" name="first_name">
 </form>
 <div>
     <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>

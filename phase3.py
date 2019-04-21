@@ -479,12 +479,43 @@ def admin_manage_site():
     sql = "SELECT SiteName FROM Site"
     cursor.execute(sql)
     sites = cursor.fetchall()
+
+    sql2 = "SELECT CONCAT(Firstname, ' ', Lastname) as Manager FROM Site Join User On Site.ManagerUsername = User.Username"
+    cursor.execute(sql2)
+    managers = cursor.fetchall()
     #initial load of table
-    sql = "SELECT SiteName, Manager, OpenEveryday FROM Site AS s JOIN (SELECT ManagerUsername, Concat(FirstName, ' ', LastName) as Manager FROM Manager JOIN user ON ManagerUsername = Username) as tmp ON tmp.ManagerUsername = s.ManagerUsername"
+    sql = "SELECT SiteName, CONCAT(Firstname, ' ', Lastname) as Manager, OpenEveryday FROM Site JOIN User ON Site.ManagerUsername = User.Username;"
     cursor.execute(sql)
     data = cursor.fetchall()
     session['current_data'] = data
-    return render_template('admin_manage_site.html', data = data, sites = sites)
+    return render_template('admin_manage_site.html', data = data, sites = sites, mans = managers)
+
+@app.route('/admin_manage_site_filter_buttonClick',methods=['GET','POST'])
+def admin_manage_site_filter_buttonClick():
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    sql2 = "SELECT CONCAT(Firstname, ' ', Lastname) as Manager FROM Site Join User On Site.ManagerUsername = User.Username"
+    cursor.execute(sql2)
+    managers = cursor.fetchall()
+
+    sql = "SELECT SiteName, CONCAT(Firstname, ' ', Lastname) as Manager, OpenEveryday FROM Site JOIN User ON Site.ManagerUsername = User.Username WHERE 1=1"
+    if not (request.form['site'] == '' or request.form['site'] == "ALL"):
+        sql += " AND SiteName = '{site}'".format(site = request.form['site'])
+    if not (request.form['manager'] == '' or request.form['manager'] == "ALL"):
+        name = request.form['manager']
+        names = name.split(' ')
+        sql += " AND Firstname = '{fname}' AND Lastname = '{lname}'".format(fname = names[0], lname = names[1])
+    if not (request.form['open_everyday'] == ''):
+        if request.form['open_everyday'] == "Yes":
+            value = 1
+        else:
+            value = 0
+        sql += " AND OpenEveryday = '{value}'".format(value = value)
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('admin_manage_site.html', data = data, sites = sites, mans = managers)
+
 
 #helper methods
 def getUserType(username):
