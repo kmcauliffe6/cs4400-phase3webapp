@@ -595,7 +595,6 @@ def admin_edit_site_updateClicked():
     sql = "UPDATE Site SET OpenEveryday = '{oed}' WHERE SiteName = '{name}'".format(oed = oed, name = session['current_site'])
     return render_template('admin_manage_site.html')
 
-
 @app.route('/admin_manage_transit_filterClick',methods=['GET','POST'])
 def admin_manage_transit_filterClick():
     sql = "SELECT SiteName FROM Site"
@@ -615,6 +614,17 @@ def admin_manage_transit_filterClick():
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('admin_manage_transit.html', sites = sites, data = data)
+
+@app.route('/admin_manage_transit_create_edit_delete',methods=['GET','POST'])
+def admin_manage_transit_create_edit_delete():
+    if request.form['action'] == 'Create':
+        get_connected_sites = "SELECT SiteName FROM Site"
+        cursor.execute(get_connected_sites)
+        sites = cursor.fetchall()
+        return render_template('admin_create_transit.html', sites = sites)
+
+@app.route('/admin_create_transit_buttonClick',methods=['GET','POST'])
+def admin_create_transit_buttonClick():
 
 #helper methods
 def getUserType(username):

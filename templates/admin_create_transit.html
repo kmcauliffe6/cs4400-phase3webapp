@@ -11,6 +11,14 @@
         <option value="Bus">Bus</option>
         <option value="Bike">Bike</option>
      </select>
+     <p><h5>Connected Sites</h5>
+        <select name="site">
+          <option value="ALL">ALL</option>
+          {% for site in sites %}
+              <option value= "{{site.SiteName}}">{{site.SiteName}}</option>"
+          {% endfor %}
+        </select>
+
       <label>Route:</label><input type="text" name="route">
       <label>Price ($):</label><input type="text" name="price">
       <label>put connected sites here</label>
