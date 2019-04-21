@@ -359,7 +359,10 @@ def go_to_user_type_functionality():
 
 @app.route('/go_to_admin_manage_transit')
 def go_to_admin_manage_transit():
-    return render_template('admin_manage_transit.html')
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    return render_template('admin_manage_transit.html', sites = sites)
 
 #transit methods
 @app.route('/filter_transit_buttonClick',methods=['GET','POST'])
@@ -591,6 +594,27 @@ def admin_edit_site_updateClicked():
     #open everyday not working yet
     sql = "UPDATE Site SET OpenEveryday = '{oed}' WHERE SiteName = '{name}'".format(oed = oed, name = session['current_site'])
     return render_template('admin_manage_site.html')
+
+
+@app.route('/admin_manage_transit_filterClick',methods=['GET','POST'])
+def admin_manage_transit_filterClick():
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    sql = "SELECT TransitRoute, TransitType, TransitPrice, NumSites, NumTaken FROM transit_connect NATURAL JOIN (SELECT TransitType, TransitRoute, COUNT(*) as NumTaken FROM TakeTransit GROUP BY TransitType, TransitRoute) as T WHERE 1=1"
+    if not (request.form['transit_type'] == '' or request.form['transit_type'] == "ALL"):
+        sql += " AND TransitType = '{type}'".format(type = request.form['transit_type'])
+    if not (request.form['contain_site'] == '' or request.form['contain_site'] == "ALL"):
+        sql += " AND SiteName = '{name}'".format(name = request.form['contain_site'])
+    if not request.form['route'] == '':
+        sql += " AND TransitRoute = '{route}'".format(route = request.form['route'])
+    if not request.form['lower'] == '':
+        sql += " AND TransitPrice >= '{low}'".format(low = request.form['lower'])
+    if not request.form['upper'] == '':
+        sql += " AND TransitPrice <= '{upper}'".format(upper = request.form['upper'])
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('admin_manage_transit.html', sites = sites, data = data)
 
 #helper methods
 def getUserType(username):
