@@ -14,7 +14,12 @@
         <p><label>Phone:</label><label>{{data[3]}}</label></p>
         <label>Update Phone:</label><input type="text" name="phone"></p>
         <p><label>Site Name:</label><label>{{data[6]}}</label></p>
-        <label>Emails:</label><label>{{data[7]['']}}</label></p>
+        <p><select name="email_to_delete" method="GET" action="/">
+            <option value = "none"> do not delete any emails</option>
+            {% for email in emails %}
+              <option value = "{{email['Email']}}">delete {{email['Email']}}</option>
+            {% endfor %}
+           </select></p>
         <label>Add Email:</label><input type="text" name="new_email"></p>
         <input class="btn btn-default" type="submit" value="Update">
     </form>

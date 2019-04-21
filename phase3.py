@@ -69,13 +69,12 @@ def visitor_visit_history():
 
 @app.route('/employee_manage_profile', methods=['GET','POST'])
 def employee_manage_profile():
-    sql = "SELECT * FROM User WHERE Username = '{username}'".format(username = session['username'])
+    sql = "SELECT Firstname, Lastname, Username FROM User WHERE Username = '{username}'".format(username = session['username'])
     cursor.execute(sql);
-    userdetails = cursor.fetchone()
-    print(userdetails)
-    first_name = userdetails['Firstname']
-    last_name = userdetails['Lastname']
-    username = userdetails['Username']
+    for row in cursor:
+        first_name = row['Firstname']
+        last_name = row['Lastname']
+        username = row['Username']
     get_site_name = "SELECT SiteName FROM Site WHERE ManagerUsername = '{username}'".format(username = username)
     cursor.execute(get_site_name)
     sitename = ""
@@ -92,16 +91,14 @@ def employee_manage_profile():
         phone = row['Phone']
     get_emails = "SELECT Email FROM UserEmail WHERE Username = '{username}'".format(username = username)
     cursor.execute(get_emails)
-    emails = []
-    for row in cursor:
-        emails.append(row['Email'])
+    emails = cursor.fetchall()
     #site name
     #employee ID
     #phone
     #address
     #emails
-    data = [first_name, last_name, username, phone, sitename, emp_id, address, emails]
-    return render_template('manage_profile.html', data=data)
+    data = [first_name, last_name, username, phone, sitename, emp_id, address]
+    return render_template('manage_profile.html', data=data, emails = emails)
 
 @app.route('/update_profile', methods=['GET','POST'])
 def update_profile():
@@ -114,13 +111,15 @@ def update_profile():
     if not request.form['last_name'] == '':
         sql = "UPDATE User SET Lastname = '{name}' WHERE Username = '{username}'".format(name = request.form['last_name'], username = session['username'])
         cursor.execute(sql)
-
+    if not request.form['email_to_delete'] == "none":
+        sql = "DELETE FROM UserEmail WHERE Username = '{username}' AND Email = '{email}'".format(username = session['username'], email = request.form['email_to_delete'])
+        cursor.execute(sql)
+    if not request.form['new_email'] == '':
+        sql = "INSERT INTO UserEmail(Username, Email) VALUES ('{username}', '{email}')".format(username = session['username'], email = request.form['new_email'])
+        cursor.execute(sql)
     #if not request.form['email'] == '': email update not working yet!!
-
-
-
     #reset values on screen
-    sql = "SELECT * FROM User WHERE Username = '{username}'".format(username = session['username'])
+    sql = "SELECT Firstname, Lastname, Username FROM User WHERE Username = '{username}'".format(username = session['username'])
     cursor.execute(sql);
     userdetails = cursor.fetchone()
     print(userdetails)
@@ -420,10 +419,8 @@ def log_transit_buttonClick():
     route = row[0]
     type = row[1]
     sql = "INSERT INTO TakeTransit(Username, TransitType, TransitRoute, TransitDate) VALUES ('{username}', '{type}', '{route}', '{date}')".format(username = session['username'], type = type, route = route, date = request.form['transit_date'])
-    print(sql)
     cursor.execute(sql)
     return render_template('user_take_transit.html')
-
 
 #manager methods
 @app.route('/manager_site_report_buttonClick',methods=['GET','POST'])
