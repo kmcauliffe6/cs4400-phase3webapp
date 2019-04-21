@@ -41,7 +41,10 @@ def register_employee_visitor():
 
 @app.route('/manager_manage_staff')
 def manager_manage_staff():
-    return render_template('manager_manage_staff.html')
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    return render_template('manager_manage_staff.html', sites = sites)
 
 @app.route('/manager_site_report')
 def manager_site_report():
@@ -66,6 +69,16 @@ def visitor_explore_site():
 @app.route('/visitor_visit_history')
 def visitor_visit_history():
     return render_template('visitor_visit_history.html')
+
+@app.route('/manager_manage_event')
+def manager_manage_event():
+    return render_template('manager_manage_event.html')
+
+@app.route('/manager_manage_event_buttonClick')
+def manager_manage_event_buttonClick():
+    #manage_event = "SELECT SiteName, COUNT(Username) as Staff Count, Count(VisitorUsername) as Total Visits, "
+    #confused about this sql statement
+    return render_template('manager_manage_event.html')
 
 @app.route('/employee_manage_profile', methods=['GET','POST'])
 def employee_manage_profile():
@@ -224,7 +237,6 @@ def register_visitor_buttonclick():
                 flash("Something went wrong.", 'alert-error')
         return render_template('register_visitor.html')
 
-#these two are giving integrity errors for everything??
 @app.route('/register_employee_buttonclick', methods=['GET','POST'])
 def register_employee_buttonclick():
     if (request.method == 'POST'):
@@ -622,6 +634,19 @@ def admin_manage_transit_create_edit_delete():
         cursor.execute(get_connected_sites)
         sites = cursor.fetchall()
         return render_template('admin_create_transit.html', sites = sites)
+    if request.form['action'] == 'Edit':
+        #edit event stuff here
+        variable = 1
+    else:
+        #not working yet
+        details = request.form['selected_transit'];
+        #delete button pressed
+        sql = "DELETE FROM Transit WHERE TransitType = '{type}' AND TransitRoute = '{route}'".format(type = details[1], route = details[0])
+        sql2 = "DELETE FROM CONNECT WHERE TransitType = '{type}' AND TransitRoute = '{route}'".format(type = details[1], route = details[0])
+        result = cursor.execute(sql)
+        cursor.execute(sql2)
+        print(result)
+        return render_template('admin_manage_transit.html')
 
 #not currently working, can't figure out why
 @app.route('/admin_create_transit_buttonClick',methods=['GET','POST'])
@@ -647,6 +672,16 @@ def admin_create_transit_buttonClick():
         flash("Route and Transport Type Combo Must Be Unique", 'alert-error')
         return render_template('admin_create_transit.html', sites = sites)
     return render_template("admin_manage_transit.html")
+
+#saying method not allowed??
+@app.route('/manage_staff_buttonClick')
+def manage_staff_buttonClick():
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    sql = "SELECT CONCAT(Firstname, ' ', Lastname) as Staff Name, COUNT(EventName) AS NumShifts FROM User JOIN Staff on User.Username = Staff.Username"
+    data = cursor.execute(sql).fetchall()
+    render_template('manager_manage_staff.html', sites = sites, data = data)
 
 #helper methods
 def getUserType(username):

@@ -16,12 +16,17 @@
       <p><label>Total Revenue Range:</label><input type="number" name="revenue_lower">
         <label>--</label><input type="number" name="revenue_upper"></p>
       <p><input class="btn btn-default" type="submit" value="Filter">
-      <input class="btn btn-default" type="submit" value="Create">
-      <input class="btn btn-default" type="submit" value="Viwe/Edit">
-      <input class="btn btn-default" type="submit" value="Delete"></p>
+      </p>
     </form>
 </div>
 </form>
+<form action="/manager_manage_event_create_view_delete" method="post">
+  <select name="selected_event" method="GET" action="/">
+        {% for item in data %}
+          <option value = "{{item['Name']}},{{item['StaffCount']}},{{item['Duration']}},{{item['Total Visits']}}{{item['Total Revenue']}}">Name: {{item['Name']}} Staff Count: {{item['StaffCount']}} Duration: {{item['Duration']}} Total Visits: {{item['Total Visits']}} Total Revenue: {{item['Total Revenue']}}</option>
+        </tr>
+      {% endfor %}
+  </form>
 <table style="width:100%">
   <tr>
     <th>Name</th>

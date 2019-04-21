@@ -2,10 +2,14 @@
 {% block title %} Manager Manage Staff {% endblock %}
 {% block header %} <h4>Manager Manage Staff</h4> {% endblock %}
 {% block content %}
-<div>
-    <form action="/manager_manage_staff_buttonClick" method="post">
+
+    <form action="/manage_staff_buttonClick" method="post">
       <label>Site</label>
       <select name="site">
+        <option value="ALL">ALL</option>
+        {% for site in sites %}
+              <option value= "{{site.SiteName}}">{{site.SiteName}}</option>"
+          {% endfor %}
      </select>
       <p><label>First Name:</label><input type="text" name="first_name">
       <label>Last Name:</label><input type="text" name="last_name"></p>
@@ -13,13 +17,16 @@
       <label>End Date:</label><input type="date" name="end_date"></p>
       <p><input class="btn btn-default" type="submit" value="Filter"></p>
     </form>
-</div>
-<table style="width:100%">
-  <tr>
-    <th>Staff Name</th>
-    <th># Event Shifts</th>
-  </tr>
-</table>
+<div>
+<form action="/manage_staff_buttonClick" method="post">
+<select name="selected_transit" method="GET" action="/">
+        {% for item in data %}
+          <option value = "{{item['Staff Name']}},{{item['NumShifts']}}">Staff Name: {{item['Staff Name']}} # of Event Shifts: {{item['NumShifts']}}</option>
+        </tr>
+      {% endfor %}
+       </select>
+     </form>
+   </div>
 <div>
     <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
 </div>
