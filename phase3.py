@@ -522,20 +522,59 @@ def admin_manage_site_buttonClick():
     selected_site = request.form['selected_site']
     site_info = selected_site.split(',')
     if request.form['action'] == 'Create':
-        get_available_managers = "SELECT CONCAT(Firstname, ' ', Lastname) as Manager FROM Manager JOIN User on Manager.Username = User.Username WHERE User.Username NOT IN (SELECT ManagerUsername FROM Site)"
+        get_available_managers = "SELECT DISTINCT CONCAT(Firstname, ' ', Lastname) as Manager FROM Manager JOIN User on Manager.Username = User.Username WHERE User.Username NOT IN (SELECT ManagerUsername FROM Site)"
         cursor.execute(get_available_managers)
         managers = cursor.fetchall()
         return render_template('admin_create_site.html', managers = managers)
     if request.form['action'] == 'Edit':
-        get_available_managers = "SELECT CONCAT(Firstname, ' ', Lastname) as Manager FROM Manager JOIN User on Manager.Username = User.Username WHERE User.Username NOT IN (SELECT ManagerUsername FROM Site WHERE not Site = '{site}')".format(site = site_info[0])
+        get_available_managers = "SELECT DISTINCT CONCAT(Firstname, ' ', Lastname) as Manager FROM Manager JOIN User on Manager.Username = User.Username WHERE User.Username NOT IN (SELECT ManagerUsername FROM Site WHERE not SiteName = '{site}')".format(site = site_info[0])
         cursor.execute(get_available_managers)
         managers = cursor.fetchall()
-        return render_template('admin_edit_site.html', managers = managers)
+        data = []
+        print(selected_site)
+        data.append(site_info[0]) #sitename
+        data.append(site_info[1]) #manager
+        data.append(site_info[2]) #open everyday
+        sql = "SELECT SiteZipcode, SiteAddress FROM Site WHERE SiteName = '{name}'".format(name = site_info[0])
+        cursor.execute(sql)
+        zipcode = 0
+        address = ""
+        for row in cursor:
+            address = row['SiteAddress']
+            zipcode = row['SiteZipcode']
+        data.append(zipcode)
+        data.append(address)
+        return render_template('admin_edit_site.html', data = data, managers = managers)
     else:
         sql = "DELETE FROM Site WHERE SiteName = '{name}'".format(name = site_info[0])
         result = cursor.execute(sql)
         print(result)
         return render_template('admin_manage_site.html')
+
+@app.route('/admin_create_site_buttonClicked',methods=['GET','POST'])
+def admin_create_site_buttonClicked():
+    name = request.form['site_name']
+    manager = request.form['manager'] #need to get username
+    zipcode = request.form['zipcode']
+    address = request.form['address']
+    open_everyday = request.form['open_everyday']
+    if open_everyday == "Yes":
+        oed = 1
+    else:
+        oed = 0
+    splitm = manager.split(' ')
+    get_manager_username = "SELECT Username FROM User WHERE Firstname = '{fname}' and Lastname = '{lname}'".format(fname = splitm[0], lname = splitm[1])
+    cursor.execute(get_manager_username)
+    username = ""
+    for row in cursor:
+        username = row['Username']
+    print(username)
+    sql = "INSERT INTO Site(SiteName, ManagerUsername, SiteAddress, SiteZipcode, OpenEveryday) VALUES ('{name}', '{username}', '{address}', '{zipcode}', '{open}')".format(name = name, username = username, address = address, zipcode = zipcode, open = oed)
+    cursor.execute(sql)
+    return render_template('admin_manage_site.html')
+
+@app.route('/admin_edit_site_updateClicked',methods=['GET','POST'])
+def admin_edit_site_updateClicked():
 
 
 #helper methods

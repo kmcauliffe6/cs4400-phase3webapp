@@ -3,7 +3,7 @@
 {% block header %} <h4>Administrator Create Site</h4> {% endblock %}
 {% block content %}
 <div>
-    <form action="/admin_edit_site_updateClicked" method="post">
+    <form action="/admin_create_site_buttonClicked" method="post">
         <label>Name:</label><input type="text" name="site_name">
         <label>Zipcode:</label><input type="number" name="zipcode">
         <label>Address:</label><input type="number" name="address">
@@ -13,8 +13,10 @@
               <option value= "{{man.Manager}}">{{man.Manager}}</option>"
           {% endfor %}
         </select>
-        <input type="checkbox" name="open_everyday" value="open_everyday">Open Everyday<br>
-        <input class="btn btn-default" type="submit" value="Create">
+        <p><input type="checkbox" name="open_everyday" value="open_everyday">Open Everyday<br></p>
+        <div class="panel-body">
+          <input type ="submit" name="action" value="Create">
+      </div>
     </form>
 </div>
 <div>

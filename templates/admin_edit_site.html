@@ -4,17 +4,23 @@
 {% block content %}
 <div>
     <form action="/admin_edit_site_updateClicked" method="post">
+        <p><label>Current Name:</label><label>  {{data[0]}}</label></p>
         <label>Update Name:</label><input type="text" name="site_name">
+        <p><label>Current Zipcode:</label><label>   {{data[3]}}</label></p>
         <label>Update Zipcode:</label><input type="number" name="zipcode">
+        <p><label>Current Address:</label><label>{{data[4]}}</label></p>
         <label>Update Address:</label><input type="number" name="address">
-        p><h5>Manager</h5>
+        <p><h5>Manager</h5>
         <select name="manager">
-        </select>
+            {% for man in managers %}
+              <option value= "{{man.Manager}}">{{man.Manager}}</option>"
+          {% endfor %}
+        </select></p>
         <input type="checkbox" name="open_everyday" value="open_everyday">Open Everyday<br>
         <input class="btn btn-default" type="submit" value="Update">
     </form>
 </div>
 <div>
-    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
+    <a href="{{ url_for('admin_manage_site') }}">Back</a>
 </div>
 {% endblock %}
