@@ -117,7 +117,19 @@ def update_profile():
     if not request.form['new_email'] == '':
         sql = "INSERT INTO UserEmail(Username, Email) VALUES ('{username}', '{email}')".format(username = session['username'], email = request.form['new_email'])
         cursor.execute(sql)
-    #if not request.form['email'] == '': email update not working yet!!
+    if request.form.get('isVisitor'):
+        sql = "SELECT * FROM Visitor WHERE Username = '{username}'".format(username = session['username'])
+        result = cursor.execute(sql)
+        if not result:
+            print("adding to visitor")
+            sql = "INSERT INTO Visitor(Username) Values ('{username}'".format(username = session['username'])
+    if not request.form.get('isVisitor'):
+        sql = "SELECT * FROM Visitor WHERE Username = '{username}'".format(username = session['username'])
+        result = cursor.execute(sql)
+        if result:
+            print("not visitor anymore")
+            sql = "DELETE FROM Visitor WHERE Username = '{username}'".format(username = session['username'])
+
     #reset values on screen
     sql = "SELECT Firstname, Lastname, Username FROM User WHERE Username = '{username}'".format(username = session['username'])
     cursor.execute(sql);
@@ -145,18 +157,9 @@ def update_profile():
     emails = []
     for row in cursor:
         emails.append(row['Email'])
-    #site name
-    #employee ID
-    #phone
-    #address
-    #emails
     data = [first_name, last_name, username, phone, sitename, emp_id, address, emails]
     return render_template('manage_profile.html', data= data)
 
-
-@app.route('/admin_manage_user', methods=['GET','POST'])
-def admin_manage_user():
-    render_template('admin_manage_user.html')
 
 #NOTE: should probably add hashing for passwords
 @app.route('/register', methods=['GET','POST'])
@@ -166,9 +169,9 @@ def register():
             flash("Passwords need to match", 'alert-error')
         else:
             emails = request.form['email'].split(',')
-            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status, UserType) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}', '{usertype}');".format(username = request.form['username'],
+            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
                 last_name = request.form['last_name'], first_name = request.form['first_name'],
-                password = request.form['password'], status = "Not Approved", usertype = "user")
+                password = request.form['password'], status = "Not Approved")
             try:
                 cursor.execute(sql)
             except pymysql.err.IntegrityError:
@@ -194,9 +197,9 @@ def register_visitor_buttonclick():
         if request.form['password'] != request.form['confirm_password']:
             flash("Passwords need to match", 'alert-error')
         else:
-            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status, UserType) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}', '{usertype}');".format(username = request.form['username'],
+            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
                 last_name = request.form['last_name'], first_name = request.form['first_name'],
-                password = request.form['password'], status = "Not Approved", usertype = "visitor")
+                password = request.form['password'], status = "Not Approved")
             try:
                 cursor.execute(sql)
             except pymysql.err.IntegrityError:
@@ -228,9 +231,9 @@ def register_employee_buttonclick():
         if request.form['password'] != request.form['confirm_password']:
             flash("Passwords need to match", 'alert-error')
         else:
-            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status, UserType) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}', '{usertype}');".format(username = request.form['username'],
+            sql = "INSERT INTO User(Username, Lastname, Firstname, Password, Status) VALUES('{username}', '{last_name}', '{first_name}', '{password}', '{status}');".format(username = request.form['username'],
                 last_name = request.form['last_name'], first_name = request.form['first_name'],
-                password = request.form['password'], status = "Not Approved", usertype = request.form['User Type'])
+                password = request.form['password'], status = "Not Approved")
             try:
                 cursor.execute(sql)
             except pymysql.err.IntegrityError:
@@ -413,14 +416,18 @@ def filter_transit__history_buttonClick():
 
 @app.route('/log_transit_buttonClick',methods=['GET','POST'])
 def log_transit_buttonClick():
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
     tablerow = request.form['selected_transit']
     print(tablerow)
     row = tablerow.split(',')
     route = row[0]
     type = row[1]
     sql = "INSERT INTO TakeTransit(Username, TransitType, TransitRoute, TransitDate) VALUES ('{username}', '{type}', '{route}', '{date}')".format(username = session['username'], type = type, route = route, date = request.form['transit_date'])
-    cursor.execute(sql)
-    return render_template('user_take_transit.html')
+    result = cursor.execute(sql)
+    print(result)
+    return render_template('user_take_transit.html', sites =  sites)
 
 #manager methods
 @app.route('/manager_site_report_buttonClick',methods=['GET','POST'])
@@ -429,6 +436,55 @@ def manager_site_report_buttonClick():
     #if request.form['Daily Detail']:
         #render_template('manager_daily_detail.html')
 
+#admin methods
+@app.route('/admin_manage_user',methods=['GET','POST'])
+def admin_manage_user():
+    #initial load of table
+    sql = "SELECT Username, COUNT(Email) AS 'Email Count', Status, UserType FROM User NATURAL JOIN UserEmail NATURAL JOIN user_type GROUP BY Username"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+
+    return render_template('admin_manage_user.html', data = data)
+
+@app.route('/admin_manage_user_filter_buttonClick',methods=['GET','POST'])
+def admin_manage_user_filter_buttonClick():
+    sql = "SELECT Username, COUNT(Email) AS 'Email Count', Status, UserType FROM User NATURAL JOIN UserEmail NATURAL JOIN user_type WHERE 1=1"
+    if not request.form['username'] == '':
+        sql += " AND Username = '{username}'".format(username = request.form['username'])
+    if not (request.form["user_type"] == "ALL" or request.form["user_type"] == ''):
+        sql += " AND UserType = '{usertype}'".format(usertype = request.form["user_type"])
+    if not (request.form["status"] == "ALL" or request.form["status"] == ''):
+        sql += " AND Status = '{status}'".format(status = request.form["status"])
+    sql += " GROUP BY Username"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('admin_manage_user.html', data = data)
+
+@app.route('/admin_manage_user_approve_or_decline',methods=['GET','POST'])
+def admin_manage_user_approve_or_decline():
+    tablerow = request.form['selected_user']
+    row = tablerow.split(',')
+    if request.form['action'] == 'Approve':
+        status = 'Approved'
+        print("approve button pressed")
+    else:
+        status = 'Declined'
+    sql = "UPDATE user SET Status = '{status}' WHERE Username = '{username}'".format(status = status, username = row[0])
+    result = cursor.execute(sql)
+    print(result)
+    return render_template('admin_manage_user.html')
+
+@app.route('/admin_manage_site',methods=['GET','POST'])
+def admin_manage_site():
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    #initial load of table
+    sql = "SELECT SiteName, Manager, OpenEveryday FROM Site AS s JOIN (SELECT ManagerUsername, Concat(FirstName, ' ', LastName) as Manager FROM Manager JOIN user ON ManagerUsername = Username) as tmp ON tmp.ManagerUsername = s.ManagerUsername"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    session['current_data'] = data
+    return render_template('admin_manage_site.html', data = data, sites = sites)
 
 #helper methods
 def getUserType(username):
@@ -487,30 +543,11 @@ def goToCorrectFunctionalityPage():
     if session['user_type'] == "admin-visitor":
         return "admin_visitor_functionality.html"
 
+
+
+
+
+
 if __name__ == "__main__":
     app.secret_key = 'supersecretkey'
     app.run(debug=True)
-
-#admin methods
-@app.route('/admin_manage_user',methods=['GET','POST'])
-def admin_manage_user():
-    #initial load of table
-    sql = "SELECT Username, COUNT(Email) AS 'Email Count', UserType, Status FROM User NATURAL JOIN UserEmail GROUP BY Username"
-    cursor.execute(sql)
-    data = cursor.fetchall()
-    return render_template('admin_manage_user.html', data = data)
-
-@app.route('/admin_manage_site',methods=['GET','POST'])
-def admin_manage_site():
-    sql = "SELECT SiteName FROM Site"
-    cursor.execute(sql)
-    sites = cursor.fetchall()
-    #initial load of table
-    sql = "SELECT SiteName, Manager, OpenEveryday FROM Site AS s JOIN (SELECT ManagerUsername, Concat(FirstName, ' ', LastName) as Manager FROM Manager JOIN user ON ManagerUsername = Username) as tmp ON tmp.ManagerUsername = s.ManagerUsername"
-    cursor.execute(sql)
-    data = cursor.fetchall()
-    session['current_data'] = data
-    return render_template('admin_manage_site.html', data = data, sites = sites)
-
-
-

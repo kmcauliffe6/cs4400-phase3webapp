@@ -3,11 +3,11 @@
 {% block header %} <h4>Manage User</h4> {% endblock %}
 {% block content %}
 <div>
-    <form action="/admin_manage_user" method="post">
-        <label>Username:</label><input type="text" name="first_name">
-        <p><h5>Type</h5>
+    <form action="/admin_manage_user_filter_buttonClick" method="post">
+        <label>Username:</label><input type="text" name="username">
+        <h5>Type</h5>
         <select name="user_type">
-            <option value="All">ALL</option>
+            <option value="ALL">ALL</option>
             <option value="Manager">Manager</option>
             <option value="User">User</option>
             <option value="Visitor">Visitor</option>
@@ -16,31 +16,27 @@
         <p><h5>Status</h5>
         <select name="status">
           <option value="ALL">ALL</option>
+          <option value="Approved">Approved</option>
           <option value="Pending">Pending</option>
-          <option value="Visitor">Visitor</option>
-          <option value="User">User</option>
+          <option value="Declined">Declined</option>
         </select>
         <input class="btn btn-default" type="submit" value="Filter">
     </form>
 </div>
 </form>
-<table style="width:100%">
-  <tr>
-    <th>Username</th>
-    <th>Email Count</th>
-    <th>User Type</th>
-    <th>Status</th>
-  </tr>
-  {% for item in data %}
-       <td>{{item.TransitDate}}</td>
-      <td>{{item.TransitRoute}}</td>
-      <td>{{item.TransitType}}</td>
-      <td>{{item.TransitPrice}}</td>
-    </tr>
-  {% endfor %}
-</table>
-<input class="btn btn-default" type="submit" value="Approve">
-<input class="btn btn-default" type="submit" value="Decline">
+<form action="/admin_manage_user_approve_or_decline" method="post"enctype="multipart/form-data">
+  <select name="selected_user" method="GET" action="/">
+        {% for item in data %}
+          <option value = "{{item['Username']}},{{item['Email Count']}},{{item['Status']}}, {{item['UserType']}}">Username: {{item['Username']}}, Email Count: {{item['Email Count']}}, User Type: {{item['UserType']}}, Status: {{item['Status']}}</option>
+      {% endfor %}
+       </select>
+  <div class="panel-body">
+          <input type ="submit" name="action" value="Approve">
+      </div>
+      <div class="panel-body">
+          <input type ="submit" name="action" value="Decline">
+      </div>
+</form>
 <div>
     <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
 </div>
