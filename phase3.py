@@ -544,6 +544,7 @@ def admin_manage_site_buttonClick():
             zipcode = row['SiteZipcode']
         data.append(zipcode)
         data.append(address)
+        session['current_site'] = data[0]
         return render_template('admin_edit_site.html', data = data, managers = managers)
     else:
         sql = "DELETE FROM Site WHERE SiteName = '{name}'".format(name = site_info[0])
@@ -575,7 +576,21 @@ def admin_create_site_buttonClicked():
 
 @app.route('/admin_edit_site_updateClicked',methods=['GET','POST'])
 def admin_edit_site_updateClicked():
-
+    if not request.form['update_address'] == '':
+        sql = "UPDATE Site SET SiteAddress = '{address}' WHERE SiteName = '{name}'".format(address = request.form['update_address'], name = session['current_site'])
+        result = cursor.execute(sql)
+    if not request.form['update_zipcode'] == '':
+        sql = "UPDATE Site SET SiteZipcode = '{zip}' WHERE SiteName = '{name}'".format(zip = request.form['update_zipcode'], name = session['current_site'])
+        cursor.execute(sql)
+    if not request.form['manager'] == '':
+        sql = "UPDATE Site SET ManagerUsername = '{mng}' WHERE SiteName = '{name}'".format(mng = request.form['manager'], name = session['current_site'])
+    if request.form['open_everyday'] == "Yes":
+        oed = 1
+    else:
+        oed = 0
+    #open everyday not working yet
+    sql = "UPDATE Site SET OpenEveryday = '{oed}' WHERE SiteName = '{name}'".format(oed = oed, name = session['current_site'])
+    return render_template('admin_manage_site.html')
 
 #helper methods
 def getUserType(username):
