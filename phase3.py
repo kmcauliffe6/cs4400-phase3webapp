@@ -5,7 +5,7 @@ app = Flask(__name__)
 connection = pymysql.connect(host='localhost',
                              user='root',
                              passwd='13',
-                             db='phase3final',
+                             db='phase3',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 cursor = connection.cursor()
@@ -386,7 +386,7 @@ def filter_transit_buttonClick():
     transportTypeFilter = request.form['transport_type']
     lowerPriceFilter = request.form['lower']
     upperPriceFilter = request.form['upper']
-    load_sites = "SELECT TransitRoute, TransitType, TransitPrice, NumSites as '# Connected Sites' FROM transit_connect WHERE 1=1"
+    load_sites = "SELECT TransitRoute, TransitType, TransitPrice, NumSites as '# Connected Sites' FROM transitconnectview WHERE 1=1"
     if not (transportTypeFilter == "ALL" or transportTypeFilter == ''):
         load_sites += " AND TransitType = '{type}'".format(type = transportTypeFilter)
     if not (siteFilter == "ALL" or siteFilter == ''):
@@ -410,7 +410,7 @@ def filter_transit__history_buttonClick():
     transportTypeFilter = request.form['transport_type']
     siteFilter = request.form['contain_site']
     routeFilter = request.form['route']
-    sql = "SELECT TransitDate, TransitRoute, TransitType, TransitPrice FROM transit_connect NATURAL JOIN TakeTransit WHERE Username = '{username}'".format(username = session['username'])
+    sql = "SELECT TransitDate, TransitRoute, TransitType, TransitPrice FROM transitconnectview NATURAL JOIN TakeTransit WHERE Username = '{username}'".format(username = session['username'])
     if not (transportTypeFilter == '' or transportTypeFilter ==  "ALL"):
         sql += " AND TransitType = '{type}'".format(type = transportTypeFilter)
     if not (siteFilter == "ALL" or siteFilter == ''):
@@ -455,7 +455,7 @@ def manager_site_report_buttonClick():
 @app.route('/admin_manage_user',methods=['GET','POST'])
 def admin_manage_user():
     #initial load of table
-    sql = "SELECT Username, COUNT(Email) AS 'Email Count', Status, UserType FROM User NATURAL JOIN UserEmail NATURAL JOIN user_type GROUP BY Username"
+    sql = "SELECT Username, COUNT(Email) AS 'Email Count', Status, UserType FROM User NATURAL JOIN UserEmail NATURAL JOIN usertypeview GROUP BY Username"
     cursor.execute(sql)
     data = cursor.fetchall()
 
@@ -463,7 +463,7 @@ def admin_manage_user():
 
 @app.route('/admin_manage_user_filter_buttonClick',methods=['GET','POST'])
 def admin_manage_user_filter_buttonClick():
-    sql = "SELECT Username, COUNT(Email) AS 'Email Count', Status, UserType FROM User NATURAL JOIN UserEmail NATURAL JOIN user_type WHERE 1=1"
+    sql = "SELECT Username, COUNT(Email) AS 'Email Count', Status, UserType FROM User NATURAL JOIN UserEmail NATURAL JOIN usertypeview WHERE 1=1"
     if not request.form['username'] == '':
         sql += " AND Username = '{username}'".format(username = request.form['username'])
     if not (request.form["user_type"] == "ALL" or request.form["user_type"] == ''):
@@ -612,7 +612,7 @@ def admin_manage_transit_filterClick():
     sql = "SELECT SiteName FROM Site"
     cursor.execute(sql)
     sites = cursor.fetchall()
-    sql = "SELECT TransitRoute, TransitType, TransitPrice, NumSites, NumTaken FROM transit_connect NATURAL JOIN (SELECT TransitType, TransitRoute, COUNT(*) as NumTaken FROM TakeTransit GROUP BY TransitType, TransitRoute) as T WHERE 1=1"
+    sql = "SELECT TransitRoute, TransitType, TransitPrice, NumSites, NumTaken FROM transitconnectview NATURAL JOIN (SELECT TransitType, TransitRoute, COUNT(*) as NumTaken FROM TakeTransit GROUP BY TransitType, TransitRoute) as T WHERE 1=1"
     if not (request.form['transit_type'] == '' or request.form['transit_type'] == "ALL"):
         sql += " AND TransitType = '{type}'".format(type = request.form['transit_type'])
     if not (request.form['contain_site'] == '' or request.form['contain_site'] == "ALL"):
@@ -674,14 +674,33 @@ def admin_create_transit_buttonClick():
     return render_template("admin_manage_transit.html")
 
 #saying method not allowed??
-@app.route('/manage_staff_buttonClick')
+@app.route('/manage_staff_buttonClick',methods=['GET','POST'])
 def manage_staff_buttonClick():
     sql = "SELECT SiteName FROM Site"
     cursor.execute(sql)
     sites = cursor.fetchall()
     sql = "SELECT CONCAT(Firstname, ' ', Lastname) as Staff Name, COUNT(EventName) AS NumShifts FROM User JOIN Staff on User.Username = Staff.Username"
     data = cursor.execute(sql).fetchall()
-    render_template('manager_manage_staff.html', sites = sites, data = data)
+    return render_template('manager_manage_staff.html', sites = sites, data = data)
+
+#staff methods
+@app.route('/staff_view_schedule_buttonClick',methods=['GET','POST'])
+def staff_view_schedule_buttonClick():
+    print(session['username'])
+    sql = "SELECT EventName, SiteName, StartDate, EndDate, COUNT(StaffUsername) AS StaffCount FROM Event NATURAL JOIN Assign_To WHERE StaffUsername = '{name}'".format(name = session['username'])
+    if not request.form['event_name'] == '':
+        sql += " AND EventName = '{ename}'".format(ename = request.form['event_name'])
+    if not request.form['description_keyword'] == '':
+        sql += " AND Description LIKE '%{key}%'".format(key = request.form['description_keyword'])
+    if not request.form['start_date'] == '':
+        sql += " AND EndDate >= '{startdate}'".format(startdate = request.form['start_date'])
+    if not request.form['end_date'] == '':
+        sql += " AND StartDate <= '{enddate}'".format(enddate = request.form['end_date'])
+    sql += "GROUP BY EventName, SiteName, StartDate"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    print(data)
+    return render_template('staff_view_schedule.html', data = data)
 
 #helper methods
 def getUserType(username):
