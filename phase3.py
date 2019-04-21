@@ -517,6 +517,27 @@ def admin_manage_site_filter_buttonClick():
     return render_template('admin_manage_site.html', data = data, sites = sites, mans = managers)
 
 
+@app.route('/admin_manage_site_buttonClick',methods=['GET','POST'])
+def admin_manage_site_buttonClick():
+    selected_site = request.form['selected_site']
+    site_info = selected_site.split(',')
+    if request.form['action'] == 'Create':
+        get_available_managers = "SELECT CONCAT(Firstname, ' ', Lastname) as Manager FROM Manager JOIN User on Manager.Username = User.Username WHERE User.Username NOT IN (SELECT ManagerUsername FROM Site)"
+        cursor.execute(get_available_managers)
+        managers = cursor.fetchall()
+        return render_template('admin_create_site.html', managers = managers)
+    if request.form['action'] == 'Edit':
+        get_available_managers = "SELECT CONCAT(Firstname, ' ', Lastname) as Manager FROM Manager JOIN User on Manager.Username = User.Username WHERE User.Username NOT IN (SELECT ManagerUsername FROM Site WHERE not Site = '{site}')".format(site = site_info[0])
+        cursor.execute(get_available_managers)
+        managers = cursor.fetchall()
+        return render_template('admin_edit_site.html', managers = managers)
+    else:
+        sql = "DELETE FROM Site WHERE SiteName = '{name}'".format(name = site_info[0])
+        result = cursor.execute(sql)
+        print(result)
+        return render_template('admin_manage_site.html')
+
+
 #helper methods
 def getUserType(username):
     print(username)

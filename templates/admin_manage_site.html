@@ -33,9 +33,15 @@
           <option value = "{{item.SiteName}},{{item.Manager}},{{item.OpenEveryday}}">Site Name: {{item.SiteName}}, Manager: {{item.Manager}}, Open Everyday: {{item.OpenEveryday}}</option>
       {% endfor %}
        </select>
-  <input class="btn btn-default" type="submit" value="Create">
-  <input class="btn btn-default" type="submit" value="Edit">
-  <input class="btn btn-default" type="submit" value="Delete">
+  <div class="panel-body">
+          <input type ="submit" name="action" value="Create">
+      </div>
+      <div class="panel-body">
+          <input type ="submit" name="action" value="Edit">
+      </div>
+      <div class="panel-body">
+          <input type ="submit" name="action" value="Delete">
+      </div>
 </form>
 <div>
     <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
