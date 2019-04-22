@@ -121,11 +121,19 @@ def update_profile():
         sql = "UPDATE User SET Lastname = '{name}' WHERE Username = '{username}'".format(name = request.form['last_name'], username = session['username'])
         cursor.execute(sql)
     if not request.form['email_to_delete'] == "none":
-        sql = "DELETE FROM UserEmail WHERE Username = '{username}' AND Email = '{email}'".format(username = session['username'], email = request.form['email_to_delete'])
-        cursor.execute(sql)
+        sql = "SELECT Email FROM UserEmail WHERE Username = '{name}'".format(name = session['username'])
+        result = cursor.execute(sql)
+        if result < 2:
+            flash("You do not have enough emails to delete one", 'alert-error')
+        else:
+            sql = "DELETE FROM UserEmail WHERE Username = '{username}' AND Email = '{email}'".format(username = session['username'], email = request.form['email_to_delete'])
+            cursor.execute(sql)
     if not request.form['new_email'] == '':
-        sql = "INSERT INTO UserEmail(Username, Email) VALUES ('{username}', '{email}')".format(username = session['username'], email = request.form['new_email'])
-        cursor.execute(sql)
+        try:
+            sql = "INSERT INTO UserEmail(Username, Email) VALUES ('{username}', '{email}')".format(username = session['username'], email = request.form['new_email'])
+            cursor.execute(sql)
+        except pymysql.err.IntegrityError:
+                flash("That email is already in use", 'alert-error')
     if request.form.get('isVisitor'):
         sql = "SELECT * FROM Visitor WHERE Username = '{username}'".format(username = session['username'])
         result = cursor.execute(sql)
@@ -382,7 +390,7 @@ def filter_transit_buttonClick():
     transportTypeFilter = request.form['transport_type']
     lowerPriceFilter = request.form['lower']
     upperPriceFilter = request.form['upper']
-    load_sites = "SELECT TransitRoute, TransitType, TransitPrice, NumSites as '# Connected Sites' FROM transitconnectview WHERE 1=1"
+    load_sites = "SELECT TransitRoute, TransitType, TransitPrice, CountSites as '# Connected Sites' FROM transitconnectview WHERE 1=1"
     if not (transportTypeFilter == "ALL" or transportTypeFilter == ''):
         load_sites += " AND TransitType = '{type}'".format(type = transportTypeFilter)
     if not (siteFilter == "ALL" or siteFilter == ''):
@@ -391,11 +399,23 @@ def filter_transit_buttonClick():
         load_sites += " AND TransitPrice >= '{lower}'".format(lower = lowerPriceFilter)
     if (not upperPriceFilter == ''):
         load_sites += " AND TransitPrice <= '{upper}'".format(upper = upperPriceFilter)
-    #not working rn, come back
-    print(load_sites)
+    if request.form['action'] == 'Filter by Ascending Transport Type':
+        load_sites += " ORDER BY TransitType ASC"
+    elif request.form['action'] == 'Filter by Descending Transport Type':
+        load_sites += " ORDER BY TransitType DESC"
+    elif request.form['action'] == 'Filter by Descending Price':
+        load_sites += " ORDER BY TransitPrice DESC"
+    elif request.form['action'] == 'Filter by Ascending Price':
+        load_sites += " ORDER BY TransitPrice ASC"
+    elif request.form['action'] == 'Filter by Ascending Connected Sites':
+        load_sites += " ORDER BY CountSites ASC"
+    elif request.form['action'] == 'Filter by Descending Connected Sites':
+        load_sites += " ORDER BY CountSites DESC"
+
     cursor.execute(load_sites)
     data = cursor.fetchall()
     return render_template('user_take_transit.html', data = data, sites = sites)
+
 
 @app.route('/filter_transit_history_buttonClick',methods=['GET','POST'])
 def filter_transit__history_buttonClick():
@@ -419,7 +439,6 @@ def filter_transit__history_buttonClick():
         sql += " AND TransitDate >= '{lower}'".format(lower = startDateFilter)
     if not endDateFilter == '':
         sql += " AND TransitDate <= '{upper}'".format(upper = endDateFilter)
-    print(sql)
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('user_view_transit_history.html', data=data, sites = sites)
@@ -430,6 +449,9 @@ def log_transit_buttonClick():
     sql = "SELECT SiteName FROM Site"
     cursor.execute(sql)
     sites = cursor.fetchall()
+    if request.form['transit_date'] == '':
+        flash("Must Select A Date", 'alert-error')
+        return render_template('user_take_transit.html', sites =  sites)
     tablerow = request.form['selected_transit']
     print(tablerow)
     row = tablerow.split(',')
@@ -443,9 +465,8 @@ def log_transit_buttonClick():
 #manager methods
 @app.route('/manager_site_report_buttonClick',methods=['GET','POST'])
 def manager_site_report_buttonClick():
+    #sql =
     render_template('manager_site_report.html')
-    #if request.form['Daily Detail']:
-        #render_template('manager_daily_detail.html')
 
 #admin methods
 @app.route('/admin_manage_user',methods=['GET','POST'])
