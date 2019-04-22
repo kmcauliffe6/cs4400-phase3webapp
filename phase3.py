@@ -792,14 +792,23 @@ def visitor_explore_event_buttonClick():
     if not request.form['end_date'] == '':
         sql += " AND StartDate <= '{enddate}'".format(enddate = request.form['end_date'])
 
-    sql += "GROUP BY EventName, SiteName, StartDate"
+    sql += " GROUP BY EventName, SiteName, StartDate"
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('visitor_explore_event.html', data = data)
 
 @app.route('/visitor_event_detail_buttonClick',methods=['GET','POST'])
 def visitor_event_detail_buttonClick():
-    return render_template('visitor_event_detail.html')
+    event = request.form['selected_event']
+    event = event.split(',')
+    eventName = event[0]
+    siteName = event[1]
+    startdate = event[7]
+    sql = "SELECT * FROM Event WHERE SiteName = '{sname}' AND EventName = '{ename}' AND StartDate = '{sdate}'".format(sdate = startdate, ename = eventName, sname = siteName)
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    print(data)
+    return render_template('visitor_event_detail.html', data = data)
 
 #helper methods
 def getUserType(username):

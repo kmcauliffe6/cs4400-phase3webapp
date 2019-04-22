@@ -5,12 +5,19 @@
 <div>
     <form action="/staff_view_schedule_buttonClick" method="post">
       <p><label>Event:</label>
-      <label>Site:</label>
+        <label>{{data.0['EventName']}}</label></p>
+      <p><label>Site:</label>
+      <label>{{data.0['SiteName']}}</label></p>
       <p><label>Start Date:</label>
-      <label>End Date:</label></p>
-      <label>Ticket Price ($):</label>
+        <label>{{data.0['StartDate']}}</label></p>
+      <p><label>End Date:</label>
+      <label>{{data.0['EndDate']}}</label></p>
+      <p><label>Ticket Price ($):</label>
+        <label>{{data.0['EventPrice']}}</label></p>
       <label>Tickets Remaining:</label>
+      <label>{{data.0['EventPrice']}}</label></p>
       <label>Desciption:</label></p>
+      <label>{{data.0['Description']}}</label></p>
       <label>Visit Date:</label><input type="text" name="visit_date">
       <p><input class="btn btn-default" type="submit" value="Log Visit">
       </p>

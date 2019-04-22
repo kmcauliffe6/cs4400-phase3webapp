@@ -15,7 +15,6 @@
       <label>End Date:</label><input type="date" name="end_date"></p>
       <p><label>Total Visit Range:</label><input type="number" name="visits_lower">
       <label>--</label><input type="number" name="visits_upper"></p>
-        <label>Transport Type</label>
       <p><label>Ticket Price Range:</label><input type="number" name="revenue_lower">
         <label>--</label><input type="number" name="revenue_upper"></p>
       <input type="checkbox" name="include_visited" value="include_visited">Include Visited<br>
@@ -24,10 +23,10 @@
       </p>
     </form>
 </div>
-<form action="/staff_view_schedule_buttonClick" method="post">
+<form action="/visitor_event_detail_buttonClick" method="post">
   <select name="selected_event" method="GET" action="/">
         {% for item in data %}
-          <option value = "{{item['EventName']}},{{item['SiteName']}},{{item['EventPrice']}}, {{item['Tickets Remaining']}}, {{item['Total Remaining']}},{{item['Total Visits']}}, {{item['My Visits']}}">Event Name: {{item['EventName']}} Site Name: {{item['SiteName']}} Ticket Price: {{item['EventPrice']}} Tickets Remaining: {{item['TicketsRemaining']}} Total Remaining: {{item['Total Remaining']}} Total Visits: {{item['TotalVisits']}} My Visits: {{item['My Visits']}}</option>
+          <option value = "{{item['EventName']}},{{item['SiteName']}},{{item['EventPrice']}}, {{item['Tickets Remaining']}}, {{item['Total Remaining']}},{{item['Total Visits']}}, {{item['My Visits']}}, {{item['StartDate']}}">Event Name: {{item['EventName']}} Site Name: {{item['SiteName']}} Ticket Price: {{item['EventPrice']}} Tickets Remaining: {{item['TicketsRemaining']}} Total Remaining: {{item['Total Remaining']}} Total Visits: {{item['TotalVisits']}} My Visits: {{item['MyVisits']}}</option>
       {% endfor %}
        </select>
     <input class="btn btn-default" type="submit" value="Event Detail">
