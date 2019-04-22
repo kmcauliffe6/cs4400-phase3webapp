@@ -54,10 +54,6 @@ def manager_site_report():
 def staff_view_schedule():
     return render_template('staff_view_schedule.html')
 
-@app.route('/staff_view_event_buttonClick')
-def staff_view_event_buttonClick():
-    return render_template('staff_view_event.html')
-
 @app.route('/visitor_explore_event')
 def visitor_explore_event():
     return render_template('visitor_explore_event.html')
@@ -699,8 +695,16 @@ def staff_view_schedule_buttonClick():
     sql += "GROUP BY EventName, SiteName, StartDate"
     cursor.execute(sql)
     data = cursor.fetchall()
-    print(data)
     return render_template('staff_view_schedule.html', data = data)
+
+@app.route('/staff_view_event_buttonClick',methods=['GET','POST'])
+def staff_view_event_buttonClick():
+    details = request.form['selection']
+    details = details.split(',')
+    sql = "SELECT EventName, SiteName, EndDate, (DateDiff(EndDate, StartDate) + 1) AS Duration, Capacity, EventPrice, Description FROM Event WHERE EventName = '{ename}' AND SiteName = '{sname}' AND StartDate = '{start_date}'".format(ename = details[0], sname = details[1], start_date = details[2])
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('staff_event_detail.html', data = data)
 
 #helper methods
 def getUserType(username):

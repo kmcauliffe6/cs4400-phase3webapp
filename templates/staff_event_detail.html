@@ -5,14 +5,23 @@
 <div>
     <form action="/" method="post">
       <p><label>Event:</label>
-      <label>Site:</label></p>
+        <label>{{data.0['EventName']}}</label>
+      <label>Site:</label>
+      <label>{{data.0['SiteName']}}</label>
       <p><label>Start Date:</label>
-      <label>End Date:</label>
-      <label>Duration Days:</label></p>
+        <label>{{data.0['StartDate']}}</label></p>
+      <p><label>End Date:</label>
+        <label>{{data.0['EndDate']}}</label></p>
+      <p><label>Duration Days:</label>
+      <label>{{data.0['Duration']}}</label></p>
       <p><label>Staffs Assigned:</label>
-      <label>Capacity:</label>
-      <label>Price:</label></p>
-      <p><label>Description:</label></p>
+        <label>{{data.0['StaffCount']}}</label></p>
+      <p><label>Capacity:</label>
+      <label>{{data.0['Capacity']}}</label></p>
+      <p><label>Price:</label></p>
+      <label>{{data.0['EventPrice']}}</label></p>
+      <p><label>Description:</label>
+        <label>{{data.0['Description']}}</label></p></p>
       <p><input class="btn btn-default" type="submit" value="Filter">
 
     </form>

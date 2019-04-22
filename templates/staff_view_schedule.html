@@ -14,7 +14,7 @@
 </div>
 <div>
   <form action="/staff_view_event_buttonClick" method="post">
-   <select name="selected_transit" method="GET" action="/">
+   <select name="selection" method="GET" action="/">
         {% for item in data %}
           <option value = "{{item['EventName']}},{{item['SiteName']}},{{item['StartDate']}},{{item['EndDate']}},{{item['StaffCount']}}">Event Name: {{item['EventName']}} Site Name: {{item['SiteName']}} Start Date: {{item['StartDate']}} End Date: {{item['EndDate']}} Staff Count: {{item['StaffCount']}}</option>
         </tr>
