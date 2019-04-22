@@ -864,6 +864,16 @@ def visitor_explore_site_buttonClick():
 
 @app.route('/visitor_log_transit',methods=['GET','POST'])
 def visitor_log_transit():
+    if request.form['transit_date'] == '':
+        flash("Must Select A Transit Date", 'alert-error')
+        return render_template('visitor_transit_detail.html')
+    tablerow = request.form['selected_transit']
+    row = tablerow.split(',')
+    route = row[0]
+    type = row[1]
+    sql = "INSERT INTO TakeTransit(Username, TransitType, TransitRoute, TransitDate) VALUES ('{username}', '{type}', '{route}', '{date}')".format(username = session['username'], type = type, route = route, date = request.form['transit_date'])
+    result = cursor.execute(sql)
+    connection.commit()
     return render_template('visitor_explore_site.html')
 
 
