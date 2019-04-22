@@ -905,7 +905,7 @@ def filter_visit_history():
     cursor.execute(sql)
     sites1 = cursor.fetchall()
     sql2 = "SELECT * FROM Visit_Event WHERE VisitorUsername = '{username}'".format(username = session['username'])
-    cursor.execute(sql)
+    cursor.execute(sql2)
     events = cursor.fetchall()
     return render_template('visitor_visit_history.html', sites1 = sites1, events = events)
 
