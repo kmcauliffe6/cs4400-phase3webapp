@@ -706,7 +706,7 @@ def admin_manage_transit_create_edit_delete():
         details = request.form['selected_transit'];
         #delete button pressed
         sql = "DELETE FROM Transit WHERE TransitType = '{type}' AND TransitRoute = '{route}'".format(type = details[1], route = details[0])
-        sql2 = "DELETE FROM CONNECT WHERE TransitType = '{type}' AND TransitRoute = '{route}'".format(type = details[1], route = details[0])
+        sql2 = "DELETE FROM CONNECT WHERE TransitType = '{type}' AND TransitRoute = '{route}' AND TransitPrice = '{price}'".format(type = details[1], route = details[0], price = details[2])
         result = cursor.execute(sql)
         cursor.execute(sql2)
         connection.commit()
@@ -715,21 +715,22 @@ def admin_manage_transit_create_edit_delete():
 #not currently working, can't figure out why
 @app.route('/admin_create_transit_buttonClick',methods=['GET','POST'])
 def admin_create_transit_buttonClick():
+    sites = request.form['sites'].split(',')
     if len(sites) < 2:
         get_connected_sites = "SELECT SiteName FROM Site"
         cursor.execute(get_connected_sites)
         sites = cursor.fetchall()
         flash("Must Select As Least 2 Connecting Sites.", 'alert-error')
         return render_template('admin_create_transit.html', sites = sites)
-    sites = request.form['sites'].split(',')
+
     try:
-        sql = "INSERT INTO Transit(TransitType, TransitRoute, TransitPrice) VALUES ('{type}', '{route}', '{price}')".format(type = request.form['transport_type'], route = request.form['route'], price = request.form['price'])
+        sql = "INSERT IGNORE INTO Transit(TransitType, TransitRoute, TransitPrice) VALUES ('{type}', '{route}', '{price}')".format(type = request.form['transport_type'], route = request.form['route'], price = request.form['price'])
         cursor.execute(sql)
         connection.commit()
         for site in sites:
-            sql = "INSERT INTO CONNECT(SiteName, TransitType, TransitRoute) VALUES ('{name}', '{type}', '{route}')".format(name = site, type = request.form['transport_type'], route = request.form['route'])
+            sql = "INSERT IGNORE INTO CONNECT(SiteName, TransitType, TransitRoute) VALUES ('{name}', '{type}', '{route}')".format(name = site, type = request.form['transport_type'], route = request.form['route'])
             cursor.execute(sql)
-
+            connection.commit()
     except pymysql.err.IntegrityError:
         get_connected_sites = "SELECT SiteName FROM Site"
         cursor.execute(get_connected_sites)
@@ -772,9 +773,33 @@ def staff_view_event_buttonClick():
     details = request.form['selection']
     details = details.split(',')
     sql = "SELECT EventName, SiteName, EndDate, (DateDiff(EndDate, StartDate) + 1) AS Duration, Capacity, EventPrice, Description FROM Event WHERE EventName = '{ename}' AND SiteName = '{sname}' AND StartDate = '{start_date}'".format(ename = details[0], sname = details[1], start_date = details[2])
+
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('staff_event_detail.html', data = data)
+
+#visitor methods
+@app.route('/visitor_explore_event_buttonClick',methods=['GET','POST'])
+def visitor_explore_event_buttonClick():
+    #not completely correct yet
+    sql = "SELECT EventName, SiteName, StartDate, EventPrice, (Capacity - IFNULL(TotalVisits, 0)) AS TicketsRemaining, IFNULL(TotalVisits, 0) AS TotalVisits, IFNULL(MyCount, 0) AS MyVisits FROM ((SELECT * FROM Event) AS e LEFT JOIN (SELECT EventName AS veEventName, SiteName AS veSiteName, StartDate AS veStartDate, COUNT(*) AS TotalVisits FROM Visit_Event GROUP BY EventName, SiteName, StartDate) AS ve ON (e.EventName = ve.veEventName AND e.SiteName = ve.veSiteName AND e.StartDate = ve.veStartDate) LEFT JOIN (SELECT EventName AS MYEventName, SiteName AS MYSiteName, StartDate AS MYStartDate, COUNT(*) AS MyCount FROM Visit_Event WHERE VisitorUsername = '{username}' GROUP BY EventName, SiteName, StartDate) AS myve ON (e.EventName = myve.MYEventName AND e.SiteName = myve.MYSiteName AND e.StartDate = myve.MYStartDate)) WHERE 1=1".format(username = session['username'])
+    if not request.form['name'] == '':
+        sql += " AND EventName = '{ename}'".format(ename = request.form['name'])
+    if not request.form['description_keyword'] == '':
+        sql += " AND Description LIKE '%{key}%'".format(key = request.form['description_keyword'])
+    if not request.form['start_date'] == '':
+        sql += " AND EndDate >= '{startdate}'".format(startdate = request.form['start_date'])
+    if not request.form['end_date'] == '':
+        sql += " AND StartDate <= '{enddate}'".format(enddate = request.form['end_date'])
+
+    sql += "GROUP BY EventName, SiteName, StartDate"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('visitor_explore_event.html', data = data)
+
+@app.route('/visitor_event_detail_buttonClick',methods=['GET','POST'])
+def visitor_event_detail_buttonClick():
+    return render_template('visitor_event_detail.html')
 
 #helper methods
 def getUserType(username):
