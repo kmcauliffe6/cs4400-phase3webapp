@@ -3,13 +3,16 @@
 {% block header %} <h4>Visitor Event Detail </h4> {% endblock %}
 {% block content %}
 <div>
-    <form action="/staff_view_schedule_buttonClick" method="post">
+    <form action="/visitor_log_visit" method="post">
       <p><label>Event:</label>
         <label>{{data.0['EventName']}}</label></p>
+        <input type="hidden" id="event_name" name="event_name" value="{{data.0['EventName']}}">
       <p><label>Site:</label>
       <label>{{data.0['SiteName']}}</label></p>
+      <input type="hidden" id="site_name" name="site_name" value="{{data.0['SiteName']}}">
       <p><label>Start Date:</label>
         <label>{{data.0['StartDate']}}</label></p>
+        <input type="hidden" id="sdate" name="sdate" value="{{data.0['StartDate']}}">
       <p><label>End Date:</label>
       <label>{{data.0['EndDate']}}</label></p>
       <p><label>Ticket Price ($):</label>
@@ -18,7 +21,7 @@
       <label>{{data.0['EventPrice']}}</label></p>
       <label>Desciption:</label></p>
       <label>{{data.0['Description']}}</label></p>
-      <label>Visit Date:</label><input type="text" name="visit_date">
+      <label>Visit Date:</label><input type="date" name="visit_date">
       <p><input class="btn btn-default" type="submit" value="Log Visit">
       </p>
     </form>

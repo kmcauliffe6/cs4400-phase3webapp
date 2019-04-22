@@ -791,7 +791,6 @@ def visitor_explore_event_buttonClick():
         sql += " AND EndDate >= '{startdate}'".format(startdate = request.form['start_date'])
     if not request.form['end_date'] == '':
         sql += " AND StartDate <= '{enddate}'".format(enddate = request.form['end_date'])
-
     sql += " GROUP BY EventName, SiteName, StartDate"
     cursor.execute(sql)
     data = cursor.fetchall()
@@ -810,6 +809,13 @@ def visitor_event_detail_buttonClick():
     print(data)
     return render_template('visitor_event_detail.html', data = data)
 
+@app.route('/visitor_log_visit',methods=['GET','POST'])
+def visitor_log_visit():
+    visitDate = request.form['visit_date']
+    sql = "INSERT INTO Visit_Event(VisitorUsername, SiteName, EventName, StartDate, VisitEventDate) VALUES('{username}', '{sname}', '{ename}', '{sdate}', '{visitdate}')".format(username = session['username'], ename = request.form['event_name'], sname = request.form['site_name'], sdate = request.form['sdate'], visitdate = visitDate)
+    cursor.execute(sql)
+    connection.commit()
+    return render_template('visitor_explore_event.html')
 #helper methods
 def getUserType(username):
     print(username)
