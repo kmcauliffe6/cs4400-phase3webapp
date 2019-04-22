@@ -439,6 +439,15 @@ def filter_transit__history_buttonClick():
         sql += " AND TransitDate >= '{lower}'".format(lower = startDateFilter)
     if not endDateFilter == '':
         sql += " AND TransitDate <= '{upper}'".format(upper = endDateFilter)
+    if request.form['action'] == 'Filter by Ascending Transport Type':
+        sql += " ORDER BY TransitType ASC"
+    elif request.form['action'] == 'Filter by Descending Transport Type':
+        sql += " ORDER BY TransitType DESC"
+    elif request.form['action'] == 'Filter by Descending Price':
+        sql += " ORDER BY TransitPrice DESC"
+    elif request.form['action'] == 'Filter by Ascending Price':
+        sql += " ORDER BY TransitPrice ASC"
+
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('user_view_transit_history.html', data=data, sites = sites)
@@ -488,6 +497,22 @@ def admin_manage_user_filter_buttonClick():
     if not (request.form["status"] == "ALL" or request.form["status"] == ''):
         sql += " AND Status = '{status}'".format(status = request.form["status"])
     sql += " GROUP BY Username"
+    if request.form['action'] == 'Filter by Ascending Username':
+        sql += " ORDER BY Username ASC"
+    elif request.form['action'] == 'Filter by Descending Username':
+        sql += " ORDER BY Username DESC"
+    elif request.form['action'] == 'Filter by Ascending Email Count':
+        sql += " ORDER BY COUNT(Email) ASC"
+    elif request.form['action'] == 'Filter by Descending Email Count':
+        sql += " ORDER BY COUNT(Email) DESC"
+    elif request.form['action'] == 'Filter by Ascending User Type':
+        sql += " ORDER BY UserType ASC"
+    elif request.form['action'] == 'Filter by Descending User Type':
+        sql += " ORDER BY UserType DESC"
+    elif request.form['action'] == 'Filter by Ascending Status':
+        sql += " ORDER BY Status ASC"
+    elif request.form['action'] == 'Filter by Descending Status':
+        sql += " ORDER BY Status DESC"
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('admin_manage_user.html', data = data)
