@@ -468,7 +468,7 @@ def log_transit_buttonClick():
     type = row[1]
     sql = "INSERT INTO TakeTransit(Username, TransitType, TransitRoute, TransitDate) VALUES ('{username}', '{type}', '{route}', '{date}')".format(username = session['username'], type = type, route = route, date = request.form['transit_date'])
     result = cursor.execute(sql)
-    print(result)
+    connection.commit()
     return render_template('user_take_transit.html', sites =  sites)
 
 #manager methods
@@ -618,7 +618,7 @@ def admin_manage_site_buttonClick():
     else:
         sql = "DELETE FROM Site WHERE SiteName = '{name}'".format(name = site_info[0])
         result = cursor.execute(sql)
-        print(result)
+        connection.commit()
         return render_template('admin_manage_site.html')
 
 @app.route('/admin_create_site_buttonClicked',methods=['GET','POST'])
@@ -659,6 +659,8 @@ def admin_edit_site_updateClicked():
         oed = 0
     #open everyday not working yet
     sql = "UPDATE Site SET OpenEveryday = '{oed}' WHERE SiteName = '{name}'".format(oed = oed, name = session['current_site'])
+    cursor.execute(sql)
+    connection.commit()
     return render_template('admin_manage_site.html')
 
 @app.route('/admin_manage_transit_filterClick',methods=['GET','POST'])
@@ -666,7 +668,7 @@ def admin_manage_transit_filterClick():
     sql = "SELECT SiteName FROM Site"
     cursor.execute(sql)
     sites = cursor.fetchall()
-    sql = "SELECT TransitRoute, TransitType, TransitPrice, NumSites, NumTaken FROM transitconnectview NATURAL JOIN (SELECT TransitType, TransitRoute, COUNT(*) as NumTaken FROM TakeTransit GROUP BY TransitType, TransitRoute) as T WHERE 1=1"
+    sql = "SELECT TransitRoute, TransitType, TransitPrice, CountSites, NumTaken FROM transitconnectview NATURAL JOIN (SELECT TransitType, TransitRoute, COUNT(*) as NumTaken FROM TakeTransit GROUP BY TransitType, TransitRoute) as T WHERE 1=1"
     if not (request.form['transit_type'] == '' or request.form['transit_type'] == "ALL"):
         sql += " AND TransitType = '{type}'".format(type = request.form['transit_type'])
     if not (request.form['contain_site'] == '' or request.form['contain_site'] == "ALL"):
@@ -677,6 +679,14 @@ def admin_manage_transit_filterClick():
         sql += " AND TransitPrice >= '{low}'".format(low = request.form['lower'])
     if not request.form['upper'] == '':
         sql += " AND TransitPrice <= '{upper}'".format(upper = request.form['upper'])
+    if request.form['action'] == 'Filter by Ascending Transport Type':
+        sql += " ORDER BY TransitType ASC"
+    elif request.form['action'] == 'Filter by Descending Transport Type':
+        sql += " ORDER BY TransitType DESC"
+    elif request.form['action'] == 'Filter by Descending Price':
+        sql += " ORDER BY TransitPrice DESC"
+    elif request.form['action'] == 'Filter by Ascending Price':
+        sql += " ORDER BY TransitPrice ASC"
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('admin_manage_transit.html', sites = sites, data = data)
@@ -699,32 +709,34 @@ def admin_manage_transit_create_edit_delete():
         sql2 = "DELETE FROM CONNECT WHERE TransitType = '{type}' AND TransitRoute = '{route}'".format(type = details[1], route = details[0])
         result = cursor.execute(sql)
         cursor.execute(sql2)
-        print(result)
+        connection.commit()
         return render_template('admin_manage_transit.html')
 
 #not currently working, can't figure out why
 @app.route('/admin_create_transit_buttonClick',methods=['GET','POST'])
 def admin_create_transit_buttonClick():
-    sites = request.form['sites'].split(',')
     if len(sites) < 2:
         get_connected_sites = "SELECT SiteName FROM Site"
         cursor.execute(get_connected_sites)
         sites = cursor.fetchall()
         flash("Must Select As Least 2 Connecting Sites.", 'alert-error')
         return render_template('admin_create_transit.html', sites = sites)
+    sites = request.form['sites'].split(',')
     try:
         sql = "INSERT INTO Transit(TransitType, TransitRoute, TransitPrice) VALUES ('{type}', '{route}', '{price}')".format(type = request.form['transport_type'], route = request.form['route'], price = request.form['price'])
         cursor.execute(sql)
+        connection.commit()
         for site in sites:
-            print(site)
             sql = "INSERT INTO CONNECT(SiteName, TransitType, TransitRoute) VALUES ('{name}', '{type}', '{route}')".format(name = site, type = request.form['transport_type'], route = request.form['route'])
             cursor.execute(sql)
+
     except pymysql.err.IntegrityError:
         get_connected_sites = "SELECT SiteName FROM Site"
         cursor.execute(get_connected_sites)
         sites = cursor.fetchall()
         flash("Route and Transport Type Combo Must Be Unique", 'alert-error')
         return render_template('admin_create_transit.html', sites = sites)
+    connection.commit()
     return render_template("admin_manage_transit.html")
 
 #saying method not allowed??
