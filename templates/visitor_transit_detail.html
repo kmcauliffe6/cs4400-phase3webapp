@@ -5,6 +5,7 @@
 <div>
     <form action="/visitor_log_transit" method="post">
       <p><label>Site:</label>
+        <label>{{sname}}</label></p>
       <label>Transport Type</label>
       <select name="transport_type">
         <option value="ALL">ALL</option>
@@ -12,14 +13,12 @@
         <option value="Bus">Bus</option>
         <option value="Bike">Bike</option>
       </select>
-      <table style="width:100%">
-        <tr>
-          <th>Route</th>
-          <th>Transport Type</th>
-          <th>Price</th>
-          <th>Connected Sites</th>
-        </tr>
-      </table>
+      <select name="selected_transit" method="GET" action="/">
+        {% for item in data %}
+          <option value = "{{item['TransitRoute']}},{{item['TransitType']}},{{item['TransitPrice']}}, {{item['CountSites']}}">Route: {{item['TransitRoute']}} Transit Type: {{item['TransitType']}} Transit Price: {{item['TransitPrice']}} # of Connected Sites: {{item['CountSites']}}</option>
+      {% endfor %}
+       </select>
+       <label>Transit Date:</label><input type="date" name="transit_date">
       <p><input class="btn btn-default" type="submit" value="Log Transit"></p>
     </form>
 </div>

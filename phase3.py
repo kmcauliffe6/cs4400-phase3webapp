@@ -60,7 +60,10 @@ def visitor_explore_event():
 
 @app.route('/visitor_explore_site')
 def visitor_explore_site():
-    return render_template('visitor_explore_site.html')
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    return render_template('visitor_explore_site.html', sites = sites)
 
 @app.route('/visitor_visit_history')
 def visitor_visit_history():
@@ -175,6 +178,7 @@ def update_profile():
     for row in cursor:
         emails.append(row['Email'])
     data = [first_name, last_name, username, phone, sitename, emp_id, address, emails]
+    connection.commit()
     return render_template('manage_profile.html', data= data)
 
 
@@ -202,6 +206,7 @@ def register():
                 session['username'] = request.form['username']
                 getUserType(request.form['username'])
                 correctpage = goToCorrectFunctionalityPage()
+                connection.commit()
                 return render_template('{page}'.format(page = correctpage))
             except pymysql.err.IntegrityError:
                 flash("One of your emails is already being used. Please try again", 'alert-error')
@@ -236,6 +241,7 @@ def register_visitor_buttonclick():
                 session['username'] = request.form['username']
                 getUserType(request.form['username'])
                 correctpage = goToCorrectFunctionalityPage()
+                connection.commit()
                 return render_template('{page}'.format(page = correctpage))
             except pymysql.err.IntegrityError:
                 flash("Something went wrong.", 'alert-error')
@@ -275,6 +281,7 @@ def register_employee_buttonclick():
                 session['username'] = request.form['username']
                 getUserType(request.form['username'])
                 correctpage = goToCorrectFunctionalityPage()
+                connection.commit()
                 return render_template('{page}'.format(page = correctpage))
             except pymysql.err.IntegrityError:
                 flash("Something went wrong", 'alert-error')
@@ -316,6 +323,7 @@ def register_employee_visitor_buttonclick():
                 session['username'] = request.form['username']
                 getUserType(request.form['username'])
                 correctpage = goToCorrectFunctionalityPage()
+                connection.commit()
                 return render_template('{page}'.format(page = correctpage))
             except pymysql.err.IntegrityError:
                 flash("Something went wrong. Please try again.", 'alert-error')
@@ -641,6 +649,7 @@ def admin_create_site_buttonClicked():
     print(username)
     sql = "INSERT INTO Site(SiteName, ManagerUsername, SiteAddress, SiteZipcode, OpenEveryday) VALUES ('{name}', '{username}', '{address}', '{zipcode}', '{open}')".format(name = name, username = username, address = address, zipcode = zipcode, open = oed)
     cursor.execute(sql)
+    connection.commit()
     return render_template('admin_manage_site.html')
 
 @app.route('/admin_edit_site_updateClicked',methods=['GET','POST'])
@@ -816,6 +825,48 @@ def visitor_log_visit():
     cursor.execute(sql)
     connection.commit()
     return render_template('visitor_explore_event.html')
+
+
+@app.route('/visitor_explore_site_filter',methods=['GET','POST'])
+def visitor_explore_site_filter():
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    sql = "SELECT SiteName, COUNT(SiteName) as EventCount FROM Event NATURAL JOIN Site WHERE 1=1"
+    if not (request.form['contain_site'] == '' or request.form['contain_site'] == "ALL"):
+        sql += " AND SiteName = '{name}'".format(name = request.form['contain_site'])
+    if not (request.form['open_everyday'] == '' or request.form['open_everyday'] == "ALL"):
+        if request.form['open_everyday'] == "No":
+            sql += " AND OpenEveryday = '{oed}'".format(oed = 0)
+        else:
+            sql += " AND OpenEveryday = '{oed}'".format(oed = 1)
+    if not request.form['start_date'] == '':
+        sql += " AND EndDate >= '{startdate}'".format(startdate = request.form['start_date'])
+    if not request.form['end_date'] == '':
+        sql += " AND StartDate <= '{enddate}'".format(enddate = request.form['end_date'])
+    sql += " GROUP BY SiteName"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('visitor_explore_site.html', data = data, sites = sites)
+
+
+@app.route('/visitor_explore_site_buttonClick',methods=['GET','POST'])
+def visitor_explore_site_buttonClick():
+    details = request.form['selected_site']
+    details = details.split(',')
+    if request.form['action'] == 'Transit Detail':
+        sname = details[0]
+        sql = "SELECT TransitRoute, TransitType, TransitPrice, CountSites FROM transitconnectview WHERE SiteName = '{sname}'".format(sname = sname)
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        print(data)
+        return render_template('visitor_transit_detail.html', sname = sname, data = data)
+
+@app.route('/visitor_log_transit',methods=['GET','POST'])
+def visitor_log_transit():
+    return render_template('visitor_explore_site.html')
+
+
 #helper methods
 def getUserType(username):
     print(username)
@@ -872,11 +923,6 @@ def goToCorrectFunctionalityPage():
         return "administrator_functionality.html"
     if session['user_type'] == "admin-visitor":
         return "admin_visitor_functionality.html"
-
-
-
-
-
 
 if __name__ == "__main__":
     app.secret_key = 'supersecretkey'

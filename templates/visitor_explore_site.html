@@ -4,22 +4,23 @@
 {% block content %}
 <div>
     <form action="/visitor_explore_site_filter" method="post">
-      <p><label>Name:</label><input type="text" name="name">
+      <p><label>Name:</label>
+      <select name="contain_site">
+        <option value="ALL">ALL</option>
+        {% for site in sites %}
+              <option value= "{{site.SiteName}}">{{site.SiteName}}</option>"
+          {% endfor %}
+      </select>
       <label>Open Everyday:</label>
       <select name="open_everyday">
         <option value="ALL">ALL</option>
         <option value="Yes">Yes</option>
         <option value="No">No</option>
       </select>
-      <label>Description Keyword:</label><input type="text" name="description_keyword"></p>
-      <label>Site Name</label>
-      <select name="site_name">
-        <option value="ALL">ALL</option>
-
-      </select>
+      <p><label>Start Date:</label><input type="date" name="start_date">
+      <label>End Date:</label><input type="date" name="end_date"></p>
       <p><label>Total Visits Range:</label><input type="number" name="visits_lower">
       <label>--</label><input type="number" name="visits_upper"></p>
-        <label>Transport Type</label>
       <p><label>Event Count Range:</label><input type="number" name="event_count_lower">
         <label>--</label><input type="number" name="event_count_upper"></p>
       <input type="checkbox" name="include_visited" value="include_visited">Include Visited<br>
@@ -28,15 +29,18 @@
     </form>
 </div>
 <form action="/visitor_explore_site_buttonClick" method="post">
-  <table style="width:100%">
-    <tr>
-      <th>Site Name</th>
-      <th>Event Count</th>
-      <th>Total Visits</th>
-      <th>My Visits</th>
-    </tr>
-    <input class="btn btn-default" type="submit" value="Site Detail">
-    <input class="btn btn-default" type="submit" value="Transit Detail">
+
+  <select name="selected_site" method="GET" action="/">
+        {% for item in data %}
+          <option value = "{{item['SiteName']}},{{item['EventCount']}}">Site Name: {{item['SiteName']}} Event Count: {{item['EventCount']}}</option>
+      {% endfor %}
+       </select>
+      <div class="panel-body">
+          <input type ="submit" name="action" value="Site Detail">
+      </div>
+      <div class="panel-body">
+          <input type ="submit" name="action" value="Transit Detail">
+      </div>
   </table>
 </form>
 <div>
