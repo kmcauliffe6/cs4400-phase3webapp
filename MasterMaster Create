@@ -1,36 +1,26 @@
-
 CREATE TABLE USER
-   	 (Username varchar(50) NOT NULL,
-   	   Password varchar(50) NOT NULL, 
-		FirstName varchar(15),
+   	(Username varchar(50) NOT NULL,
+   	Password varchar(50) NOT NULL, 
+	FirstName varchar(15),
       	LastName varchar(15),
       	Status varchar(15), 
-      	PRIMARY KEY (Username)
-
-   	 );
+      	PRIMARY KEY (Username));
 
 CREATE TABLE USEREMAIL
-   	 ( Username varchar(50) NOT NULL,
+   	(Username varchar(50) NOT NULL,
       	Email varchar(50) NOT NULL,
-
       	PRIMARY KEY (Email),
       	FOREIGN KEY (Username) REFERENCES User(Username)
-
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
-);
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE TABLE VISITOR
-   	 ( Username varchar(50) NOT NULL,
+   	(Username varchar(50) NOT NULL,
       	PRIMARY KEY (Username),
       	FOREIGN KEY (Username) REFERENCES User(Username)
-
-	ON DELETE CASCADE
-	ON UPDATE CASCADE  
-      	);
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE TABLE EMPLOYEE
-   	 (Username varchar(50) NOT NULL,
+   	(Username varchar(50) NOT NULL,
       	EmployeeID char(9) NOT NULL,
       	Phone char(10) NOT NULL,
       	EmployeeAddress varchar(50),
@@ -39,61 +29,40 @@ CREATE TABLE EMPLOYEE
       	EmployeeZipcode char(5),
       	PRIMARY KEY (Username),
       	FOREIGN KEY (Username) REFERENCES User(Username)
-
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
-
-      	);
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 
 CREATE TABLE Administrator
-   	 (Username varchar(50) NOT NULL,
-
+   	(Username varchar(50) NOT NULL,
       	PRIMARY KEY (Username),
       	FOREIGN KEY (Username) REFERENCES Employee(Username)
-
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
-      	);
-
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE TABLE Manager
-   	 (Username varchar(50) NOT NULL,
-
+   	(Username varchar(50) NOT NULL,
       	PRIMARY KEY (Username),
       	FOREIGN KEY (Username) REFERENCES Employee(Username)
-
-ON DELETE CASCADE
-	ON UPDATE CASCADE  
-      	);
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE TABLE Staff
-   	 (Username varchar(50) NOT NULL,
-
-   	 PRIMARY KEY (Username),
+   	(Username varchar(50) NOT NULL,
+   	PRIMARY KEY (Username),
       	FOREIGN KEY (Username) REFERENCES Employee(Username)
-
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
-    	);
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 
 CREATE TABLE Site
-   	 ( SiteName varchar(50),
+   	(SiteName varchar(50),
       	SiteAddress varchar(50),
       	SiteZipcode int(5),
       	OpenEveryday boolean NOT NULL,
       	ManagerUsername varchar(50) NOT NULL,
-
       	PRIMARY KEY (SiteName),
       	FOREIGN KEY (ManagerUsername) REFERENCES Manager(Username)
-
-	ON DELETE CASCADE 
-	ON UPDATE CASCADE
-      	);
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE TABLE Event   
-   	 ( SiteName varchar(50) NOT NULL,
+   	(SiteName varchar(50) NOT NULL,
       	EventName varchar(50) NOT NULL, 
       	StartDate date NOT NULL,
       	EndDate date NOT NULL,
@@ -102,119 +71,91 @@ CREATE TABLE Event
         CHECK (Capacity > 0),
       	MinStaffRequired int UNSIGNED NOT NULL,
      	Description MEDIUMTEXT NOT NULL,
-
       	PRIMARY KEY (SiteName, EventName, StartDate),
       	FOREIGN KEY (SiteName) REFERENCES Site(SiteName)
-
-      	ON DELETE CASCADE
-	ON UPDATE CASCADE
-      	);
+      	ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE TABLE Assign_To
-   	 ( StaffUsername varchar(50) NOT NULL,
+   	(StaffUsername varchar(50) NOT NULL,
       	SiteName varchar(50) NOT NULL,
       	EventName varchar(50) NOT NULL,
       	StartDate date NOT NULL,
-
       	PRIMARY KEY (StaffUsername, SiteName, EventName, StartDate),
       	FOREIGN KEY (StaffUsername) REFERENCES Staff(Username)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
       	FOREIGN KEY (SiteName, EventName, StartDate) REFERENCES Event(SiteName,  EventName, StartDate)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
-      	);
-        #Error Code: 1050. Table 'user' already exists Error Code: 3734. Failed to add the foreign key constraint. Missing column 'staffusername' for constraint 'assign_to_ibfk_1' in the referenced table 'Staff'
-
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 
 CREATE TABLE Transit
-   	 ( TransitType varchar(15) NOT NULL,
+   	(TransitType varchar(15) NOT NULL,
       	TransitRoute varchar(15) NOT NULL,
       	TransitPrice decimal(9,2) NOT NULL,
-
-      	PRIMARY KEY (TransitType, TransitRoute)
-
-      	);
+      	PRIMARY KEY (TransitType, TransitRoute));
 
 CREATE TABLE Connect
-   	 ( SiteName varchar(50) NOT NULL,
+   	(SiteName varchar(50) NOT NULL,
       	TransitType varchar(15) NOT NULL,
       	TransitRoute varchar(15) NOT NULL,
-
       	PRIMARY KEY (SiteName, TransitType, TransitRoute),
       	FOREIGN KEY (SiteName) REFERENCES Site(SiteName)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
       	FOREIGN KEY (TransitType, TransitRoute) REFERENCES Transit(TransitType, TransitRoute)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
-
-      	);
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 CREATE TABLE TakeTransit
-   	 (Username varchar(50) NOT NULL,
+   	(Username varchar(50) NOT NULL,
       	TransitType varchar(50) NOT NULL,
       	TransitRoute varchar(50) NOT NULL,
       	TransitDate date NOT NULL,
-
       	PRIMARY KEY (Username, TransitType, TransitRoute, TransitDate),
       	FOREIGN KEY (Username) REFERENCES User(Username)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
       	FOREIGN KEY (TransitType, TransitRoute) REFERENCES Transit(TransitType, TransitRoute)
-	ON DELETE CASCADE
-	ON UPDATE RESTRICT
-      	);
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 
 CREATE TABLE Visit_Site
-   	 (VisitorUsername varchar(50) NOT NULL,
+   	(VisitorUsername varchar(50) NOT NULL,
       	SiteName varchar(50) NOT NULL,
       	VisitSiteDate date NOT NULL,
-
       	PRIMARY KEY (VisitorUsername, SiteName, VisitSiteDate),
       	FOREIGN KEY (VisitorUsername) REFERENCES Visitor(Username)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
       	FOREIGN KEY (SiteName) REFERENCES Site(SiteName)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
-      	);
-        #Error Code: 3734. Failed to add the foreign key constraint. Missing column 'name' for constraint 'visit_site_ibfk_2' in the referenced table 'Site'
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
 
 CREATE TABLE Visit_Event
-   	 (VisitorUsername varchar(16) NOT NULL,
+   	(VisitorUsername varchar(16) NOT NULL,
       	SiteName varchar(64) NOT NULL,
       	EventName varchar(64) NOT NULL,
       	StartDate date NOT NULL,
       	VisitEventDate date NOT NULL,
-
       	PRIMARY KEY (VisitorUsername, SiteName, EventName, StartDate, VisitEventDate),
       	FOREIGN KEY (VisitorUsername) REFERENCES Visitor(Username)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE,
+	ON DELETE CASCADE ON UPDATE CASCADE,
       	FOREIGN KEY (SiteName, EventName, StartDate) REFERENCES Event(SiteName, EventName, StartDate)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
-      	);
+	ON DELETE CASCADE ON UPDATE CASCADE);
 
-CREATE VIEW transit_connect AS
-SELECT T.TransitType, T.TransitRoute, T.TransitPrice, C.SiteName, tmp.num_sites as NumSites
-    FROM transit AS T JOIN connect AS C 
+CREATE VIEW TransitConnectView AS
+SELECT T.TransitType, T.TransitRoute, T.TransitPrice, C.SiteName, tmp.CountSites as CountSites
+    FROM Transit AS T JOIN Connect AS C
                       ON (T.TransitType, T.TransitRoute) = (C.TransitType, C.TransitRoute) 
-                      JOIN (SELECT TransitType, TransitRoute, count(*) AS num_sites FROM connect GROUP BY TransitType, TransitRoute) AS tmp 
+                      JOIN (SELECT TransitType, TransitRoute, count(*) AS CountSites FROM connect GROUP BY TransitType, TransitRoute) AS tmp 
                       ON (T.TransitType, T.TransitRoute) = (tmp.TransitType, tmp.TransitRoute);
 
-CREATE VIEW emp_profile AS
-SELECT E.Username, E.EmployeeID, E.Phone, Concat(E.EmployeeAddress, ', ', E.EmployeeCity, ' ', E.EmployeeState, ', ', E.EmployeeZipcode) as Address
-	FROM Employee as E;
+CREATE VIEW EmployeeProfileView AS
+SELECT Employee.Username, Employee.EmployeeID, Employee.Phone, Concat(Employee.EmployeeAddress, ', ', Employee.EmployeeCity, ' ', Employee.EmployeeState, ', ', Employee.EmployeeZipcode) as Address FROM Employee;
 
-CREATE VIEW user_type AS 
-SELECT Username, CASE WHEN EXISTS(SELECT * FROM manager WHERE Username = u.Username) = 1 THEN 'Manager' collate utf8mb4_general_ci
-				 WHEN EXISTS(SELECT * FROM staff WHERE Username = u.Username) = 1 THEN 'Staff' collate utf8mb4_general_ci
-				 WHEN EXISTS(SELECT * FROM visitor WHERE Username = u.Username) = 1 THEN 'Visitor' collate utf8mb4_general_ci
+CREATE VIEW UserTypeView AS 
+SELECT Username, CASE WHEN EXISTS(SELECT * FROM manager WHERE Username = User.Username) = 1 THEN 'Manager' collate utf8mb4_general_ci
+				 WHEN EXISTS(SELECT * FROM staff WHERE Username = User.Username) = 1 THEN 'Staff' collate utf8mb4_general_ci
+				 WHEN EXISTS(SELECT * FROM visitor WHERE Username = User.Username) = 1 THEN 'Visitor' collate utf8mb4_general_ci
                              ELSE 'User' collate utf8mb4_general_ci
-       END AS UserType
-FROM User AS u WHERE NOT EXISTS(SELECT * FROM administrator WHERE Username = u.Username);
+       END AS UserType 
+FROM User WHERE NOT EXISTS(SELECT * FROM Administrator WHERE Username = User.Username);
