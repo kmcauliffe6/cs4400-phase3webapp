@@ -121,11 +121,19 @@ def update_profile():
         sql = "UPDATE User SET Lastname = '{name}' WHERE Username = '{username}'".format(name = request.form['last_name'], username = session['username'])
         cursor.execute(sql)
     if not request.form['email_to_delete'] == "none":
-        sql = "DELETE FROM UserEmail WHERE Username = '{username}' AND Email = '{email}'".format(username = session['username'], email = request.form['email_to_delete'])
-        cursor.execute(sql)
+        sql = "SELECT Email FROM UserEmail WHERE Username = '{name}'".format(name = session['username'])
+        result = cursor.execute(sql)
+        if result < 2:
+            flash("You do not have enough emails to delete one", 'alert-error')
+        else:
+            sql = "DELETE FROM UserEmail WHERE Username = '{username}' AND Email = '{email}'".format(username = session['username'], email = request.form['email_to_delete'])
+            cursor.execute(sql)
     if not request.form['new_email'] == '':
-        sql = "INSERT INTO UserEmail(Username, Email) VALUES ('{username}', '{email}')".format(username = session['username'], email = request.form['new_email'])
-        cursor.execute(sql)
+        try:
+            sql = "INSERT INTO UserEmail(Username, Email) VALUES ('{username}', '{email}')".format(username = session['username'], email = request.form['new_email'])
+            cursor.execute(sql)
+        except pymysql.err.IntegrityError:
+                flash("That email is already in use", 'alert-error')
     if request.form.get('isVisitor'):
         sql = "SELECT * FROM Visitor WHERE Username = '{username}'".format(username = session['username'])
         result = cursor.execute(sql)
@@ -382,7 +390,7 @@ def filter_transit_buttonClick():
     transportTypeFilter = request.form['transport_type']
     lowerPriceFilter = request.form['lower']
     upperPriceFilter = request.form['upper']
-    load_sites = "SELECT TransitRoute, TransitType, TransitPrice, NumSites as '# Connected Sites' FROM transitconnectview WHERE 1=1"
+    load_sites = "SELECT TransitRoute, TransitType, TransitPrice, CountSites as '# Connected Sites' FROM transitconnectview WHERE 1=1"
     if not (transportTypeFilter == "ALL" or transportTypeFilter == ''):
         load_sites += " AND TransitType = '{type}'".format(type = transportTypeFilter)
     if not (siteFilter == "ALL" or siteFilter == ''):
@@ -391,11 +399,23 @@ def filter_transit_buttonClick():
         load_sites += " AND TransitPrice >= '{lower}'".format(lower = lowerPriceFilter)
     if (not upperPriceFilter == ''):
         load_sites += " AND TransitPrice <= '{upper}'".format(upper = upperPriceFilter)
-    #not working rn, come back
-    print(load_sites)
+    if request.form['action'] == 'Filter by Ascending Transport Type':
+        load_sites += " ORDER BY TransitType ASC"
+    elif request.form['action'] == 'Filter by Descending Transport Type':
+        load_sites += " ORDER BY TransitType DESC"
+    elif request.form['action'] == 'Filter by Descending Price':
+        load_sites += " ORDER BY TransitPrice DESC"
+    elif request.form['action'] == 'Filter by Ascending Price':
+        load_sites += " ORDER BY TransitPrice ASC"
+    elif request.form['action'] == 'Filter by Ascending Connected Sites':
+        load_sites += " ORDER BY CountSites ASC"
+    elif request.form['action'] == 'Filter by Descending Connected Sites':
+        load_sites += " ORDER BY CountSites DESC"
+
     cursor.execute(load_sites)
     data = cursor.fetchall()
     return render_template('user_take_transit.html', data = data, sites = sites)
+
 
 @app.route('/filter_transit_history_buttonClick',methods=['GET','POST'])
 def filter_transit__history_buttonClick():
@@ -419,7 +439,15 @@ def filter_transit__history_buttonClick():
         sql += " AND TransitDate >= '{lower}'".format(lower = startDateFilter)
     if not endDateFilter == '':
         sql += " AND TransitDate <= '{upper}'".format(upper = endDateFilter)
-    print(sql)
+    if request.form['action'] == 'Filter by Ascending Transport Type':
+        sql += " ORDER BY TransitType ASC"
+    elif request.form['action'] == 'Filter by Descending Transport Type':
+        sql += " ORDER BY TransitType DESC"
+    elif request.form['action'] == 'Filter by Descending Price':
+        sql += " ORDER BY TransitPrice DESC"
+    elif request.form['action'] == 'Filter by Ascending Price':
+        sql += " ORDER BY TransitPrice ASC"
+
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('user_view_transit_history.html', data=data, sites = sites)
@@ -430,6 +458,9 @@ def log_transit_buttonClick():
     sql = "SELECT SiteName FROM Site"
     cursor.execute(sql)
     sites = cursor.fetchall()
+    if request.form['transit_date'] == '':
+        flash("Must Select A Date", 'alert-error')
+        return render_template('user_take_transit.html', sites =  sites)
     tablerow = request.form['selected_transit']
     print(tablerow)
     row = tablerow.split(',')
@@ -437,15 +468,14 @@ def log_transit_buttonClick():
     type = row[1]
     sql = "INSERT INTO TakeTransit(Username, TransitType, TransitRoute, TransitDate) VALUES ('{username}', '{type}', '{route}', '{date}')".format(username = session['username'], type = type, route = route, date = request.form['transit_date'])
     result = cursor.execute(sql)
-    print(result)
+    connection.commit()
     return render_template('user_take_transit.html', sites =  sites)
 
 #manager methods
 @app.route('/manager_site_report_buttonClick',methods=['GET','POST'])
 def manager_site_report_buttonClick():
+    #sql =
     render_template('manager_site_report.html')
-    #if request.form['Daily Detail']:
-        #render_template('manager_daily_detail.html')
 
 #admin methods
 @app.route('/admin_manage_user',methods=['GET','POST'])
@@ -467,6 +497,22 @@ def admin_manage_user_filter_buttonClick():
     if not (request.form["status"] == "ALL" or request.form["status"] == ''):
         sql += " AND Status = '{status}'".format(status = request.form["status"])
     sql += " GROUP BY Username"
+    if request.form['action'] == 'Filter by Ascending Username':
+        sql += " ORDER BY Username ASC"
+    elif request.form['action'] == 'Filter by Descending Username':
+        sql += " ORDER BY Username DESC"
+    elif request.form['action'] == 'Filter by Ascending Email Count':
+        sql += " ORDER BY COUNT(Email) ASC"
+    elif request.form['action'] == 'Filter by Descending Email Count':
+        sql += " ORDER BY COUNT(Email) DESC"
+    elif request.form['action'] == 'Filter by Ascending User Type':
+        sql += " ORDER BY UserType ASC"
+    elif request.form['action'] == 'Filter by Descending User Type':
+        sql += " ORDER BY UserType DESC"
+    elif request.form['action'] == 'Filter by Ascending Status':
+        sql += " ORDER BY Status ASC"
+    elif request.form['action'] == 'Filter by Descending Status':
+        sql += " ORDER BY Status DESC"
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('admin_manage_user.html', data = data)
@@ -523,6 +569,18 @@ def admin_manage_site_filter_buttonClick():
         else:
             value = 0
         sql += " AND OpenEveryday = '{value}'".format(value = value)
+    if request.form['action'] == 'Filter by Ascending Name':
+        sql += " ORDER BY Sitename ASC"
+    elif request.form['action'] == 'Filter by Descending Name':
+        sql += " ORDER BY SiteName DESC"
+    elif request.form['action'] == 'Filter by Descending Manager':
+        sql += " ORDER BY CONCAT(Firstname, ' ', Lastname) DESC"
+    elif request.form['action'] == 'Filter by Ascending Manager':
+        sql += " ORDER BY CONCAT(Firstname, ' ', Lastname) ASC"
+    elif request.form['action'] == 'Filter by Ascending Open Everyday':
+        sql += " ORDER BY OpenEveryday ASC"
+    elif request.form['action'] == 'Filter by Descending Open Everyday':
+        sql += " ORDER BY OpenEveryday DESC"
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('admin_manage_site.html', data = data, sites = sites, mans = managers)
@@ -560,7 +618,7 @@ def admin_manage_site_buttonClick():
     else:
         sql = "DELETE FROM Site WHERE SiteName = '{name}'".format(name = site_info[0])
         result = cursor.execute(sql)
-        print(result)
+        connection.commit()
         return render_template('admin_manage_site.html')
 
 @app.route('/admin_create_site_buttonClicked',methods=['GET','POST'])
@@ -601,6 +659,8 @@ def admin_edit_site_updateClicked():
         oed = 0
     #open everyday not working yet
     sql = "UPDATE Site SET OpenEveryday = '{oed}' WHERE SiteName = '{name}'".format(oed = oed, name = session['current_site'])
+    cursor.execute(sql)
+    connection.commit()
     return render_template('admin_manage_site.html')
 
 @app.route('/admin_manage_transit_filterClick',methods=['GET','POST'])
@@ -608,7 +668,7 @@ def admin_manage_transit_filterClick():
     sql = "SELECT SiteName FROM Site"
     cursor.execute(sql)
     sites = cursor.fetchall()
-    sql = "SELECT TransitRoute, TransitType, TransitPrice, NumSites, NumTaken FROM transitconnectview NATURAL JOIN (SELECT TransitType, TransitRoute, COUNT(*) as NumTaken FROM TakeTransit GROUP BY TransitType, TransitRoute) as T WHERE 1=1"
+    sql = "SELECT TransitRoute, TransitType, TransitPrice, CountSites, NumTaken FROM transitconnectview NATURAL JOIN (SELECT TransitType, TransitRoute, COUNT(*) as NumTaken FROM TakeTransit GROUP BY TransitType, TransitRoute) as T WHERE 1=1"
     if not (request.form['transit_type'] == '' or request.form['transit_type'] == "ALL"):
         sql += " AND TransitType = '{type}'".format(type = request.form['transit_type'])
     if not (request.form['contain_site'] == '' or request.form['contain_site'] == "ALL"):
@@ -619,6 +679,14 @@ def admin_manage_transit_filterClick():
         sql += " AND TransitPrice >= '{low}'".format(low = request.form['lower'])
     if not request.form['upper'] == '':
         sql += " AND TransitPrice <= '{upper}'".format(upper = request.form['upper'])
+    if request.form['action'] == 'Filter by Ascending Transport Type':
+        sql += " ORDER BY TransitType ASC"
+    elif request.form['action'] == 'Filter by Descending Transport Type':
+        sql += " ORDER BY TransitType DESC"
+    elif request.form['action'] == 'Filter by Descending Price':
+        sql += " ORDER BY TransitPrice DESC"
+    elif request.form['action'] == 'Filter by Ascending Price':
+        sql += " ORDER BY TransitPrice ASC"
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('admin_manage_transit.html', sites = sites, data = data)
@@ -638,10 +706,10 @@ def admin_manage_transit_create_edit_delete():
         details = request.form['selected_transit'];
         #delete button pressed
         sql = "DELETE FROM Transit WHERE TransitType = '{type}' AND TransitRoute = '{route}'".format(type = details[1], route = details[0])
-        sql2 = "DELETE FROM CONNECT WHERE TransitType = '{type}' AND TransitRoute = '{route}'".format(type = details[1], route = details[0])
+        sql2 = "DELETE FROM CONNECT WHERE TransitType = '{type}' AND TransitRoute = '{route}' AND TransitPrice = '{price}'".format(type = details[1], route = details[0], price = details[2])
         result = cursor.execute(sql)
         cursor.execute(sql2)
-        print(result)
+        connection.commit()
         return render_template('admin_manage_transit.html')
 
 #not currently working, can't figure out why
@@ -654,19 +722,22 @@ def admin_create_transit_buttonClick():
         sites = cursor.fetchall()
         flash("Must Select As Least 2 Connecting Sites.", 'alert-error')
         return render_template('admin_create_transit.html', sites = sites)
+
     try:
-        sql = "INSERT INTO Transit(TransitType, TransitRoute, TransitPrice) VALUES ('{type}', '{route}', '{price}')".format(type = request.form['transport_type'], route = request.form['route'], price = request.form['price'])
+        sql = "INSERT IGNORE INTO Transit(TransitType, TransitRoute, TransitPrice) VALUES ('{type}', '{route}', '{price}')".format(type = request.form['transport_type'], route = request.form['route'], price = request.form['price'])
         cursor.execute(sql)
+        connection.commit()
         for site in sites:
-            print(site)
-            sql = "INSERT INTO CONNECT(SiteName, TransitType, TransitRoute) VALUES ('{name}', '{type}', '{route}')".format(name = site, type = request.form['transport_type'], route = request.form['route'])
+            sql = "INSERT IGNORE INTO CONNECT(SiteName, TransitType, TransitRoute) VALUES ('{name}', '{type}', '{route}')".format(name = site, type = request.form['transport_type'], route = request.form['route'])
             cursor.execute(sql)
+            connection.commit()
     except pymysql.err.IntegrityError:
         get_connected_sites = "SELECT SiteName FROM Site"
         cursor.execute(get_connected_sites)
         sites = cursor.fetchall()
         flash("Route and Transport Type Combo Must Be Unique", 'alert-error')
         return render_template('admin_create_transit.html', sites = sites)
+    connection.commit()
     return render_template("admin_manage_transit.html")
 
 #saying method not allowed??
@@ -702,9 +773,33 @@ def staff_view_event_buttonClick():
     details = request.form['selection']
     details = details.split(',')
     sql = "SELECT EventName, SiteName, EndDate, (DateDiff(EndDate, StartDate) + 1) AS Duration, Capacity, EventPrice, Description FROM Event WHERE EventName = '{ename}' AND SiteName = '{sname}' AND StartDate = '{start_date}'".format(ename = details[0], sname = details[1], start_date = details[2])
+
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('staff_event_detail.html', data = data)
+
+#visitor methods
+@app.route('/visitor_explore_event_buttonClick',methods=['GET','POST'])
+def visitor_explore_event_buttonClick():
+    #not completely correct yet
+    sql = "SELECT EventName, SiteName, StartDate, EventPrice, (Capacity - IFNULL(TotalVisits, 0)) AS TicketsRemaining, IFNULL(TotalVisits, 0) AS TotalVisits, IFNULL(MyCount, 0) AS MyVisits FROM ((SELECT * FROM Event) AS e LEFT JOIN (SELECT EventName AS veEventName, SiteName AS veSiteName, StartDate AS veStartDate, COUNT(*) AS TotalVisits FROM Visit_Event GROUP BY EventName, SiteName, StartDate) AS ve ON (e.EventName = ve.veEventName AND e.SiteName = ve.veSiteName AND e.StartDate = ve.veStartDate) LEFT JOIN (SELECT EventName AS MYEventName, SiteName AS MYSiteName, StartDate AS MYStartDate, COUNT(*) AS MyCount FROM Visit_Event WHERE VisitorUsername = '{username}' GROUP BY EventName, SiteName, StartDate) AS myve ON (e.EventName = myve.MYEventName AND e.SiteName = myve.MYSiteName AND e.StartDate = myve.MYStartDate)) WHERE 1=1".format(username = session['username'])
+    if not request.form['name'] == '':
+        sql += " AND EventName = '{ename}'".format(ename = request.form['name'])
+    if not request.form['description_keyword'] == '':
+        sql += " AND Description LIKE '%{key}%'".format(key = request.form['description_keyword'])
+    if not request.form['start_date'] == '':
+        sql += " AND EndDate >= '{startdate}'".format(startdate = request.form['start_date'])
+    if not request.form['end_date'] == '':
+        sql += " AND StartDate <= '{enddate}'".format(enddate = request.form['end_date'])
+
+    sql += "GROUP BY EventName, SiteName, StartDate"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return render_template('visitor_explore_event.html', data = data)
+
+@app.route('/visitor_event_detail_buttonClick',methods=['GET','POST'])
+def visitor_event_detail_buttonClick():
+    return render_template('visitor_event_detail.html')
 
 #helper methods
 def getUserType(username):

@@ -3,7 +3,7 @@
 {% block header %} <h4>Visitor Explore Event </h4> {% endblock %}
 {% block content %}
 <div>
-    <form action="/staff_view_schedule_buttonClick" method="post">
+    <form action="/visitor_explore_event_buttonClick" method="post">
       <p><label>Name:</label><input type="text" name="name">
       <label>Description Keyword:</label><input type="text" name="description_keyword"></p>
       <label>Site Name</label>
@@ -25,15 +25,11 @@
     </form>
 </div>
 <form action="/staff_view_schedule_buttonClick" method="post">
-  <table style="width:100%">
-    <tr>
-      <th>Event Name</th>
-      <th>Site Name</th>
-      <th>Ticket Price</th>
-      <th>Ticket Remaining</th>
-      <th>Total Visits</th>
-      <th>My Visits</th>
-    </tr>
+  <select name="selected_event" method="GET" action="/">
+        {% for item in data %}
+          <option value = "{{item['EventName']}},{{item['SiteName']}},{{item['EventPrice']}}, {{item['Tickets Remaining']}}, {{item['Total Remaining']}},{{item['Total Visits']}}, {{item['My Visits']}}">Event Name: {{item['EventName']}} Site Name: {{item['SiteName']}} Ticket Price: {{item['EventPrice']}} Tickets Remaining: {{item['TicketsRemaining']}} Total Remaining: {{item['Total Remaining']}} Total Visits: {{item['TotalVisits']}} My Visits: {{item['My Visits']}}</option>
+      {% endfor %}
+       </select>
     <input class="btn btn-default" type="submit" value="Event Detail">
   </table>
 </form>

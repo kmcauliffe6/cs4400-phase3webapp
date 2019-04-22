@@ -20,9 +20,25 @@
           <option value="Pending">Pending</option>
           <option value="Declined">Declined</option>
         </select>
-        <input class="btn btn-default" type="submit" value="Filter">
+        <input type ="submit" name="action" value="Filter">
+          <input type ="submit" name="action" value="Filter by Ascending Username">
+          <input type ="submit" name="action" value="Filter by Descending Username">
+          <input type ="submit" name="action" value="Filter by Ascending Email Count">
+          <input type ="submit" name="action" value="Filter by Descending Email Count">
+          <input type ="submit" name="action" value="Filter by Ascending User Type">
+          <input type ="submit" name="action" value="Filter by Descending User Type">
+          <input type ="submit" name="action" value="Filter by Ascending Status">
+          <input type ="submit" name="action" value="Filter by Descending Status">
     </form>
+<div>
+  <p>
+    <p>
+      <p>
+      </p>
+    </p>
+  </p>
 </div>
+</p>
 </form>
 <form action="/admin_manage_user_approve_or_decline" method="post"enctype="multipart/form-data">
   <select name="selected_user" method="GET" action="/">
