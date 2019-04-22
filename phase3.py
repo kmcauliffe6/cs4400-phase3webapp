@@ -569,6 +569,18 @@ def admin_manage_site_filter_buttonClick():
         else:
             value = 0
         sql += " AND OpenEveryday = '{value}'".format(value = value)
+    if request.form['action'] == 'Filter by Ascending Name':
+        sql += " ORDER BY Sitename ASC"
+    elif request.form['action'] == 'Filter by Descending Name':
+        sql += " ORDER BY SiteName DESC"
+    elif request.form['action'] == 'Filter by Descending Manager':
+        sql += " ORDER BY CONCAT(Firstname, ' ', Lastname) DESC"
+    elif request.form['action'] == 'Filter by Ascending Manager':
+        sql += " ORDER BY CONCAT(Firstname, ' ', Lastname) ASC"
+    elif request.form['action'] == 'Filter by Ascending Open Everyday':
+        sql += " ORDER BY OpenEveryday ASC"
+    elif request.form['action'] == 'Filter by Descending Open Everyday':
+        sql += " ORDER BY OpenEveryday DESC"
     cursor.execute(sql)
     data = cursor.fetchall()
     return render_template('admin_manage_site.html', data = data, sites = sites, mans = managers)
