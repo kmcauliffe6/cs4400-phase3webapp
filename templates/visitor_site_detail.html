@@ -3,11 +3,15 @@
 {% block header %} <h4>Visitor Transit Detail </h4> {% endblock %}
 {% block content %}
 <div>
-    <form action="/visitor_log_visit" method="post">
+    <form action="/visitor_log_site_visit" method="post">
+        <input type="hidden" id="site_name" name="site_name" value="{{sname}}">
       <p><label>Site:</label>
+        <label>{{sname}}</label></p>
       <label>Open Everyday</label>
-     <label>Address</label>
-     <label>Visit Date:</label><input type="date" name="route">
+      <label>{{oed}}</label>
+     <p><label>Address</label>
+        <label>{{address}}</label></p>
+     <label>Visit Date:</label><input type="date" name="visit_date">
       <p><input class="btn btn-default" type="submit" value="Log Visit"></p>
     </form>
 </div>

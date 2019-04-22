@@ -832,7 +832,7 @@ def visitor_explore_site_filter():
     sql = "SELECT SiteName FROM Site"
     cursor.execute(sql)
     sites = cursor.fetchall()
-    sql = "SELECT SiteName, COUNT(SiteName) as EventCount FROM Event NATURAL JOIN Site WHERE 1=1"
+    sql = "SELECT SiteName, COUNT(SiteName) as EventCount, SiteAddress, OpenEveryday FROM Event NATURAL JOIN Site WHERE 1=1"
     if not (request.form['contain_site'] == '' or request.form['contain_site'] == "ALL"):
         sql += " AND SiteName = '{name}'".format(name = request.form['contain_site'])
     if not (request.form['open_everyday'] == '' or request.form['open_everyday'] == "ALL"):
@@ -861,6 +861,15 @@ def visitor_explore_site_buttonClick():
         data = cursor.fetchall()
         print(data)
         return render_template('visitor_transit_detail.html', sname = sname, data = data)
+    else:
+        sname = details[0]
+        address = details[2]
+        oed = details[3]
+        if oed == 0:
+            oed = "Yes"
+        else:
+            oed = "No"
+        return render_template('visitor_site_detail.html', sname = sname, address = address, oed = oed)
 
 @app.route('/visitor_log_transit',methods=['GET','POST'])
 def visitor_log_transit():
@@ -876,6 +885,15 @@ def visitor_log_transit():
     connection.commit()
     return render_template('visitor_explore_site.html')
 
+@app.route('/visitor_log_site_visit',methods=['GET','POST'])
+def visitor_log_site_visit():
+    if request.form['visit_date'] == '':
+        flash("Must Select A Transit Date", 'alert-error')
+        return render_template('visitor_site_detail.html')
+    sql = "INSERT INTO Visit_Site(VisitorUsername, SiteName, VisitSiteDate) VALUES('{username}', '{sname}', '{date}')".format(username = session['username'], sname = request.form['site_name'], date = request.form['visit_date'])
+    cursor.execute(sql)
+    connection.commit()
+    return render_template('visitor_explore_site.html')
 
 #helper methods
 def getUserType(username):

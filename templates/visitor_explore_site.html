@@ -32,7 +32,7 @@
 
   <select name="selected_site" method="GET" action="/">
         {% for item in data %}
-          <option value = "{{item['SiteName']}},{{item['EventCount']}}">Site Name: {{item['SiteName']}} Event Count: {{item['EventCount']}}</option>
+          <option value = "{{item['SiteName']}},{{item['EventCount']}},{{item['SiteAddress']}}, {{item['OpenEveryday']}}">Site Name: {{item['SiteName']}} Event Count: {{item['EventCount']}}</option>
       {% endfor %}
        </select>
       <div class="panel-body">
