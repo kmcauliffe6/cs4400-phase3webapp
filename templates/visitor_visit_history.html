@@ -7,6 +7,9 @@
       <label>Site</label>
       <select name="contain_site">
         <option value="ALL">ALL</option>
+        {% for site in sites %}
+              <option value= "{{site.SiteName}}">{{site.SiteName}}</option>"
+          {% endfor %}
       </select></p>
       <p><label>Start Date:</label><input type="date" name="start_date">
       <label>End Date:</label><input type="date" name="end_date">
@@ -21,10 +24,26 @@
         <th>Site</th>
         <th>Price</th>
       </tr>
+      {% for item in sites1 %}
+      <tr>
+          <td>{{item.VisitSiteDate}}</td>
+          <td>                   </td>
+          <td>{{item.SiteName}}</td>
+          <td>0</td>
+       </tr>
+      {% endfor %}
+      {% for item in events %}
+      <tr>
+          <td>{{item.VisitSiteDate}}</td>
+          <td>{{item.EventName}}</td>
+          <td>{{item.SiteName}}</td>
+          <td>{{item.EventPrice}}</td>
+       </tr>
+      {% endfor %}
     </table>
 
 <div>
-    <a href="{{ url_for('go_to_user_functionality') }}">Back</a>
+    <a href="{{ url_for('go_to_user_type_functionality') }}">Back</a>
 </div>
 
 {% endblock %}

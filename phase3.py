@@ -67,7 +67,10 @@ def visitor_explore_site():
 
 @app.route('/visitor_visit_history')
 def visitor_visit_history():
-    return render_template('visitor_visit_history.html')
+    sql = "SELECT SiteName FROM Site"
+    cursor.execute(sql)
+    sites = cursor.fetchall()
+    return render_template('visitor_visit_history.html', sites = sites)
 
 @app.route('/manager_manage_event')
 def manager_manage_event():
@@ -894,6 +897,17 @@ def visitor_log_site_visit():
     cursor.execute(sql)
     connection.commit()
     return render_template('visitor_explore_site.html')
+
+
+@app.route('/filter_visit_history',methods=['GET','POST'])
+def filter_visit_history():
+    sql = "SELECT VisitSiteDate, SiteName FROM Visit_Site WHERE VisitorUsername = '{username}'".format(username = session['username'])
+    cursor.execute(sql)
+    sites1 = cursor.fetchall()
+    sql2 = "SELECT * FROM Visit_Event WHERE VisitorUsername = '{username}'".format(username = session['username'])
+    cursor.execute(sql)
+    events = cursor.fetchall()
+    return render_template('visitor_visit_history.html', sites1 = sites1, events = events)
 
 #helper methods
 def getUserType(username):
